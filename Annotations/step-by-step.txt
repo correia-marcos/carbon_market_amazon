@@ -1,0 +1,46 @@
+*Base criada em abri/maio/jun 2023*
+
+
+Entrei no site https://data.ecosystemmarketplace.com/
+
+"Issuances and Retirements" section then click in Meta-Registry
+
+Minimum Year Registered=1999
+Country=Brazil
+All projects (sorty by Registry)
+
+
+* O que fazer com os nomes de projetos com typos? 
+
+Quando projeto não tem KML file: entrar nos documentos e pegar a localização por lat e lond
+	--> Verra project 665 doesnt have KML
+
+==============================================================================================================
+==============================================================================================================
+==============================================================================================================
+Certification Date:
+
+In order to take the certification year, we check the date of the VCS VALIDATION DEED OF REPRESENTATION.
+This document definies when the project was approved by the Validator (sometimes the Verra website uses misleading date).
+
+
+==============================================================================================================
+==============================================================================================================
+==============================================================================================================
+
+
+Problematic files/projects:
+
+Verra project 665
+Project does not cointain KML file, but I got some points for lat e lond in one of their documents
+I've made by hand on python.
+
+	--> Not sure if a use the role property size or just the part of it that is defined by the ARR project
+That is, most of the property is not credit eligible, but maybe a higher area makes easier for the program to
+merge with CAR data. 
+	--> Actually, I'm going to put just the project area and save the area of the property. Area of project
+is the common use in VERRA, so makes sense to maintain the consistency.
+
+==============================================================================================================
+==============================================================================================================
+==============================================================================================================

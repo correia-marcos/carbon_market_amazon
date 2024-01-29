@@ -1,0 +1,47 @@
+Verra_832: APD
+- Planned to legally deforest 20% of the property to pasture. In the project scenario, the project will not deforest and will earn resources from carbon market.
+
+
+Verra_875: AUD
+- Rate of deforestation of 2.94%/year is adopted for calculation of FSM-REDD Project benefits. Deforestation is considered to occur through clear-cutting of forests for logging followed by pasture installation (≈90%) or coffee cultivation (≈10%). Location analysis involved the preparation of deforestation risk maps. Algorithms of internationally peer-reviewed modelling tools were elected to prepare deforestation risk maps, to conform to the methodology at time of validation. The criteria used for adjustment of these algorithms were based on proximity with deforested areas, proximity with roads, proximity and dimension of water bodies, landscape characteristics, and limits of parks and indigenous reserves
+
+
+Verra_981: AUD
+- First calculate rate of baseline deforestation, which assumed to be a continuation of the average annual rate measured during the historical reference period (1996-2008). It's calculated as the rate between forest cover in 2008 divided by the one in 1996 elevated by 1/(2008-1996) which gives a deforestation rate of 1,77%. Then, a Similarity Weighted Instance-based Machine Learning algorithm with a Markov chain model based on the past observed deforestation rate is performed to predict areas vulnerable to forest changes using multi-temporal remote sensing data. The software used to run this quantitative prediction is Idrisi Selva, with the Land Change Modeler tool, which allows to rapidly analyze land cover change, simulate future land change scenarios, and model species impacts and biodiversity.
+
+
+Verra_1094: AUD
+- Calibration of the simulation model and Markov chains coupled with a cellular automaton algorithm and transition probability matrix estimated by logistic regression.
+
+
+Verra_1115: AUD
+- Simple projection of future deforestation using the average deforestation of 2000-2010 as the parameter (0,269% deforestation per year). Thus the future deforestation is equal past times average deforestation. For the determination of the locate of the deforestation in the baseline it was used the Land Change Modeler (LCM), an option of modeling land use and land cover available in the IDRISI Selva software.
+
+
+Verra_1118: AUD
+- Projection model of land use change in the TISS was developed. This model is called SimSuruí and is based on system dynamics to represent the existing system in TISS, its agents and their interactions with the surrounding vegetation. The determinant vector of these interactions is expressed by the needs and wants of the natives earning a living alternative to timber sales – the main activities being cattle farming and coffee growing. The model includes five sub-models: demographics, groups of land use change agents, economic dynamics of agent groups, subsistence agriculture, and vegetation dynamics in the TISS. Observing trends in the region, these five sub-models interact to produce the area to be deforested in the baseline scenario (without the project).
+
+
+Verra_1147: AUD
+- Planned to legally deforest and make forestry activities would continue throughout the areas to sell timber in accordance with the Sustainable Forest Management. In the project scenario, the project will not deforest and will earn resources from carbon market.
+
+
+Verra_1654: AUD
+- The chosen tool for the analysis of Fortaleza Ituxi REDD Project baseline is the Land Change Modeler, LCM (Eastman, 2009), available at 16.0 IDRISI Taiga Edition software.
+
+
+Verra_1686: AUD
+- Calibration of the simulation model and Markov chains coupled with a cellular automaton algorithm and transition probability matrix estimated by logistic regression
+
+
+Verra_1811: AUD
+- Simple projection of future deforestation using the average deforestation of 2000-2010 as the parameter. For the elaboration of maps of factors related to distances, a differential approach was used in this Project. Several studies show that distance maps (distance of roads, old deforestation, etc.) can be used to identify the characteristics of the deforestation occurrence. In this project, this assumption was adapted generating maps of accessibility to these variables. Using the COST module of the TerrSet software, vector variable maps were combined with the elevation variance map. The variable vector map, for example, of roads, was used as the origin point and the elevation variance map as a friction surface. The main assumption of this approach was that deforestation tends to occur in the most accessible areas and close to the vector variables.
+
+
+Verra_1953: AUD
+- Simple projection of future deforestation using the average deforestation of 2000-2014 as the parameter. Thus the future deforestation is equal past times average deforestation. Also used a Similarity Weighted Instance-based Learning for the Generation of Transition Potentials in Land Use Change Modeling, in order to estimate the weights of the drivers of deforestation and the probable places of deforestation.
+ 
+
+Verra_2252: AUD
+- Simple projection of future deforestation using the average deforestation of 2000-2014 as the parameter (0,37% deforestation per year). Thus the future deforestation is equal past times average deforestation. Also used a Similarity Weighted Instance-based Learning for the Generation of Transition Potentials in Land Use Change Modeling, in order to estimate the weights of the drivers of deforestation and the probable places of deforestation.
+

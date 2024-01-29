@@ -1,0 +1,690 @@
+ACR191
+- There is geographic coordinates in ACR_191.pdf
+
+
+ACR105 
+- There is geographic coordinates (points) in ACR_105.pdf
+
+
+ACR165
+- It was a CDM before
+
+
+ACR215
+- No information
+- Project cancelled
+
+
+ACR216
+- No information
+- Project cancelled
+
+
+ACR217
+- No information
+- Project cancelled
+
+
+ACR218
+- No information
+- Project cancelled
+
+
+ACR219
+- No information
+- Project cancelled
+
+
+ACR220
+- No information
+- Project cancelled
+
+
+GS1042
+- There is geographic coordinates (points) in GS_1042.pdf
+
+
+GS1244
+- There is geographic coordinates (points) in GS_1244.pdf
+
+
+GS1291
+- There is a geographic coordinates (points) in GS_1291.pdf
+
+
+GS2290
+- There is a geographic coordinates (points) in GS_2290.pdf
+- Same project as Verra 1070
+
+
+GS3434
+- There is a geographic coordinates (points) in GS_3434.pdf
+
+
+GS6050
+- There is a geographic coordinates (points) in GS_6050.docx
+
+
+GS832
+- There is a geographic coordinates (points) in GS_832.pdf
+- It was a CDM before
+
+
+GS765
+- There is a geographic coordinates (points) in GS_765.pdf
+- It was a CDM before
+
+
+GS11728
+- Same project as Verra_1076
+- There is a geographic coordinates (points) in GS_1076.pdf
+
+
+GS3122
+- The project has never sold credits - No vintage
+- It was a CDM before
+
+
+Verra_103
+- It was a CDM before
+
+
+Verra_1070
+- There is geographic coordinates (polygon) in Verra_1070.pdf
+- It is also available on Gold Standard Registry (id: GS2290)
+
+
+Verra_1076
+- Changed the Credit period from "01/03/2018 - 28/02/2025" to "07/08/2009 - 28/02/2025" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+- It was a CDM project before
+- It is also available on Gold Standard Registry (id: GS11728)
+
+
+Verra_1094
+- The ownership of the Project is being investigated because it is using public conservation reserves (Resex) withing the project area
+- Associação dos Moradores da Reserva Extrativista Mapuá (Amorema) is suing the project to receive rights from the local community resulting from its nature protection service (they don't receive many from the project - as they state)
+
+
+Verra_1115
+- Jari Group (one of the proponents) is under investigation for illegal logging
+
+
+Verra_1144
+- There is geographic coordinates (points) in Verra_1144.pdf
+
+
+Verra_1147
+- There is no KML on Verra website (it will be updated soon - expected week of 23/09/2023)
+- It was added
+
+
+Verra_1229
+- There is geographic coordinates (points) in Verra_1229.pdf
+- Changed the Credit period from "01/04/2016 - 31/03/2026" to "01/04/2006 - 31/07/2024" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_1294
+- There is geographic coordinates (points) in Verra_1294.pdf
+- Changed the Credit period from "03/01/2018 - 02/01/2025" to "03/01/2011 - 02/01/2025" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_130
+- There is geographic coordinates (points) in Verra_130.pdf
+- Changed the Credit period from "01/01/2021 - 31/12/2030" to "01/01/2011 - 31/12/2030" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_131
+- There is geographic coordinates (polygon) in Verra_130.pdf
+
+
+Verra_1382
+- Verra denied renovation of the project do to presence of extractive communities inside and outside the rural property - There was deforestation inside the project
+- See https://www1.folha.uol.com.br/mercado/2023/09/petrobras-compra-creditos-de-carbono-de-projeto-com-desmatamento-e-sem-base-plausivel.shtml
+- See https://www.wrm.org.uy/pt/artigos-do-boletim/projeto-envira-redd-no-acre-brasil-certificadoras-de-carbono-atribuem-nivel-ouro-a-promessas-vazias
+
+
+Verra_143
+- There is geographic coordinates (polygon) in Verra_143.pdf
+
+
+Verra_146
+- There is a geographic coordinate (point) in Verra_146.pdf
+- Changed the credit period from "01/01/2017 - 31/12/2026" to "01/04/2008 - 31/12/2026" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time) 
+
+
+Verra_1550
+- There is a geographic coordinate (point) in Verra_1550.pdf
+- Changed the credit period from "01/03/2019 - 28/02/2026" to "01/03/2012 - 28/02/2026" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time) 
+
+
+Verra_1553
+- There is a geographic coordinate (point) in Verra_1553.pdf
+
+
+Verra_158
+- There is a geographic coordinate (point) in Verra_158.pdf
+- Changed the credit period from "01/04/2018 - 31/03/2028" to "01/07/2008 - 31/03/2028" do to inconsistencies with the project's documents
+
+
+Verra_164
+- There is a geographic coordinate (point) in Verra_158.pdf
+
+
+Verra_1700
+- There is geographic coordinates (points) in Verra_1700.pdf
+- This project has not have a change in credit period because it was a CDM project before
+
+
+Verra_1737
+- There is geographic coordinates (points) in Verra_1737(cdm).pdf
+
+
+Verra_180
+- changed the credit period from "02/11/2020 - 01/11/2027" to "01/09/2006 - 01/11/2027" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time) 
+- This project was a CDM before
+
+
+Verra_1804
+- There is geographic coordinates (polygon) in Verra_1804.pdf
+
+
+Verra_1811
+- The project is "On Hold" on Verra, do to Verra making a project review report. There is many problems with gov though (https://economia.uol.com.br/noticias/reuters/2023/03/27/investigacao-na-amazonia-brasileira-projeto-de-credito-de-carbono-em-xeque-alimenta-receio-de-grilagem-de-terras.htm)
+- Project is under investigation by legal authorities
+- In the Public Comment period, The NBS Brazil Alliance said that:
+	. Analyzing the last Jari Pará REDD+ project Monitoring Report, it is possible to observe that the project had some challenges in complying with all the proposed social and biodiversity actions due to some obstacles, such as financial issues of the Jari institute (co-proponent)
+	. There is very little information on the quantification of emissions (only references to the already validated PD calculations), so it is not possible to assess this aspect of the project in detail.
+	. There is a critical point in the MR, which despite being widely addressed in the MR (item 2.4.1), it is not possible to fully confirm due to lack of evidence (only the audit available). This is a possible land ownership dispute (Gleba Jari I) between the Jari Institute and the state of Pará
+
+
+Verra_1812
+- There is geographic coordinates (points) in Verra_1812.pdf 
+
+
+Verra_1850
+- There is geographic coordinates (points) in Verra_1850.pdf
+- It was a CDM before
+
+
+Verra_19
+- There is geographic coordinates (points) in Verra_19.pdf
+
+
+Verra_1902
+- There is a geographic coordinat (point) in Verra_1902.pdf
+- It was a CDM before
+
+
+Verra_1903
+- There is geographic coordinates (points) in Verra_1903.pdf
+
+
+Verra_1953
+- In the Public Comment period, The NBS Brazil Alliance said that:
+	. It should be interesting to provide an explanation on why the baseline GHG emission, presented on table 6 of this MR, is different from the baseline GHG emission presented in the Table on page 175 of the PD. Considering that the present monitoring is under the same baseline as presented in the PD (under 6 years, so no revalidation needed) it should have equal values
+	. When assessing the leakage in the current monitoring, it was important to check it on the PD. It should be interesting to justify why the leakage value in the Project Description is considered zero, since considering VM0015 leakage cannot be considered zero in the baseline scenario
+	. In 2.3.14 it is said that most jobs created by the project are related to planting trees. However, reforestation is not included as a Project Activity. More detail should be given to better explain the correlation between the Project Activities and its employability.
+	. Regarding the monitored parameters, the ones presented in the PD where monitored in the MR02 as expected. However, there is an incoherence with the values presented under the item 'Number of Verified Carbon Units (VCUs) to be made available for trade at time t' ( 997,614; 1,163,611; 1,142,927) and the final numbers of tradables VCUs presented at at Table 6 (150,367; 269,688;313,087)
+
+
+Verra_197
+- There is a geographic coordinate (point) in Verra_197.pdf
+
+
+Verra_198
+- There is a geographic coordinate (point) in Verra_198.pdf
+- Changed the Credit period from "01/10/2016 - 30/09/2026" to "01/10/2006 - 12/31/2026" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_199
+- There is geographic coordinates (polygon) in Verra_199.pdf 
+- Changed the credit period from "01/04/2018 - 31/03/2028" to "01/04/2008 - 31/03/2028" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time) 
+
+
+Verra_20
+- There is geographic coordinates (points) in Verra_20.pdf
+
+
+Verra_200
+- There is a geographic coordinate (point) in Verra_200.pdf
+- Changed the Credit period from "01/04/2016 - 31/03/2026" to "01/04/2006 - 31/03/2026" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_201
+- There is a geographic coordinate (point) in Verra_201.pdf
+- Changed the Credit period from "01/12/2017 - 30/11/2027" to "01/12/2007 - 30/11/2027" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_202
+- There is geographic coordinates (polygon) in Verra_202.pdf
+- Not completely sure if the project was renew
+
+
+Verra_21
+- There are geographic coordinates (points) in Verra_21(cdm).pdf
+- It was a CDM before
+
+
+Verra_22
+- There are geographic coordinates (points) in Verra_22(cdm).pdf
+- It was a CDM before
+
+
+Verra_2252
+- The project is "On Hold" on Verra, do to Verra making a project review report - Verra received stakeholder comments concerning the Rio Anapu-Pacaja REDD Project
+- One paper from WRM (World Rainforest Movement) advocates that the community's benefits from the project are false (cookstoves that are not used, and false claims of tenure in lands) while the project uses state project within its boundary
+- See https://www.wrm.org.uy/pt/publicacoes/neocolonialismo-na-amazonia-projetos-redd-em-portel-brasil
+
+
+Verra_23
+- There is geographic coordinates (points) in Verra_23(cdm).pdf
+- It was a CDM project before
+- Changed the Credit period from "01/01/2021 - 31/12/2027" to "01/08/2007 - 31/12/2027" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_2306
+- There is a geographic coordinates (point) in Verra_2306(cdm).pdf
+- Changed the Crediting Period Term from "CREDITING PERIOD HAS EXPIRED, 22/05/2007 - 21/05/2014" to "3rd, 22/05/2007 - 21/05/2028" since this the precise information in the UNFCC website
+- It is a CDM project
+
+
+Verra_2316
+- There are geographic coordinates (points) in Verra_2306(cdm).pdf
+- Changed the Crediting Period Term from "CREDITING PERIOD HAS EXPIRED, 08/11/2010 - 07/11/2017" to "2nd, 08/11/2010 - 07/11/2024" since this the precise information in the UNFCC website
+- It is a CDM project
+
+
+Verra_24
+- There is a geographic coordinates (point) in Verra_24(cdm).pdf
+- It was a CDM project before
+
+
+Verra_247
+- There is absolutely no files or further information on this project
+
+
+Verra_2508
+- There are geographic coordinates (polygons) in Verra_2508.pdf
+
+
+Verra_2539
+- There is no KML on Verra website
+
+
+Verra_2600
+- There is a geographic coordinate (point) in Verra_2600(cdm).pdf
+- It was a CDM project before
+
+
+Verra_2620
+- The project is under investigation by a public civil action against three companies and private entity that are. The project is using public areas (five state agro -extractive settlements) without correct permissions - green grilage. Projects proponents also have argued that they have payed for the land tenure of "ribeirinhos", but they actually only made the Cadastro Ambiental Rural (CAR) of them, which is a self -declaratory electronic record that is mandatory for all rural properties. According to public defender Andreia Barreto, Ribeirinho Redd+ was based on 191 illegal rural environmental records, of which 190 have already been canceled and one is suspended.
+- One paper from WRM (World Rainforest Movement) advocates that the community's benefits from the project are false (cookstoves that are not used, and false claims of tenure in lands) while the project uses state project within its boundary
+- See https://www.wrm.org.uy/pt/publicacoes/neocolonialismo-na-amazonia-projetos-redd-em-portel-brasil
+
+
+Verra_286
+- There is absolutely no files or further information on this project
+
+
+Verra_3010
+- There is a geographic coordinate (point) in Verra_3010(cdm).pdf
+- Changed the Crediting Period Term from "CREDITING PERIOD HAS EXPIRED, 31/07/2013 - 30/07/2020" to "2nd, 31/07/2013 - 30/07/2020" since this the precise information in the UNFCC website (it was recently renew)
+- It was a CDM project before
+
+
+Verra_304
+- There is a geographic coordinate (point) in Verra_304(cdm).pdf
+- It was a CDM project before
+- Changed the Credit period from "01/10/2021 - 30/09/2028" to "01/10/2007 - 30/09/2028" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_32
+- Missing pdfs regarding the project design, so we took the final report of verification as the pdf
+
+
+Verra_322
+- There are geographic coordinates (polygon) in Verra_322.pdf
+
+
+Verra_323
+- There is geographic coordinates (polygon) in Verra_323.pdf
+
+
+Verra_329
+- Missing pdfs regarding the project design, so we took a verification report as the pdf
+- Changed the Credit period from "01/04/2016 - 31/03/2026" to "01/04/2006 - 31/03/2026" do to inconsistencies with the project's documents (we presume to be such as there is no project description pdf in the project webpage)
+
+
+Verra_33
+- There is a geographic coordinate (point) in Verra_33.pdf
+- The project in "On Hold" on Verra, due to the fact the, during a complete check per Section 4.3.1 of the Registration and Issuance Process (v4.3) the project alleged did not conform with some VCS Program Rules (The project violates the requirements for rotation of validation/verification bodies (VVBs); Monitoring report v4.2 is not followed; Verification report v4.2 is not followed).
+
+
+Verra_332
+- There are geographic coordinates (points) in Verra_332.pdf
+- Changed the Credit period from "01/04/2016 - 31/03/2026" to "01/04/2006 - 31/03/2026" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_34
+- There is a geographic coordinate (point) in Verra_34.pdf
+
+Verra_341
+- Missing pdfs regarding the project design (description), so we took the Project Idea Note (PIN) as the pdf
+
+
+Verra_354
+- There is a geographic coordinate (point) in Verra_354.pdf
+- Changed the Credit period from "01/06/2017 - 31/05/2027" to "01/06/2007 - 31/05/2027" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_385
+- There is absolutely no files or further information on this project
+
+
+Verra_4
+- There are geographic coordinates (points) in Verra_4(cdm).pdf
+- It was a CDM project before
+
+
+Verra_451
+- Missing pdfs regarding the project design, so we took a verification report as the pdf
+
+
+Verra_455
+- There are geographic coordinates (polygon) in Verra_455.pdf
+- Changed the Credit period from "01/09/2009 - 31/08/2019" to "01/04/2008 - 28/02/2018" do to inconsistencies with the project's documents
+
+
+Verra_456
+- There are geographic coordinates (polygon) in Verra_456.pdf
+
+
+Verra_513
+- There are geographic coordinates (polygon) in Verra_513.pdf
+
+
+Verra_52
+- There is a geographic coordinate (point) in Verra_52.pdf
+
+
+Verra_53
+- There is a geographic coordinate (point) in Verra_53.pdf
+- Changed the Credit period from "01/09/2017 - 31/08/2027" to "01/09/2007 - 31/08/2027" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_54
+- There are geographic coordinates (points) in Verra_53.pdf
+
+
+Verra_55
+- Missing pdfs regarding the project design (description), so we took the Project Verification Report as the pdf
+
+
+Verra_558
+- There is a geographic coordinate (point) in Verra_558.pdf
+
+
+Verra_586
+- There are geographic coordinates (polygon) in Verra_586.pdf
+- Project is on the process of renew, althought it's not shown in the Verra crediting period information
+
+
+Verra_60
+- Missing pdfs regarding the project design (description), so we took the Project Idea Note (PIN) as the pdf
+- Changed the Credit period from "01/04/2020 - 31/03/2027" to "01/04/2006 - 31/03/2027" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_602
+- There is a geographic coordinate (point) in Verra_602.pdf
+
+
+Verra_61
+- Missing pdfs regarding the project design (description), so we took the Project Idea Note (PIN) as the pdf
+- Changed the Credit period from "01/04/2016 - 31/03/2026" to "01/04/2006 - 31/03/2026" do to inconsistencies with the project's documents (we presume to be such as there is no project description pdf in the project webpage)
+
+
+Verra_63
+- Missing pdfs regarding the project design (description), so we took the Project Idea Note (PIN) as the pdf
+
+
+Verra_64
+- There is a geographic coordinate (point) in Verra_64.pdf
+- Project is on the process of renew, althought it's not shown in the Verra crediting period information
+
+
+Verra_65
+- Missing pdfs regarding the project design, so we took a verification report as the pdf
+
+
+Verra_665
+- There are geographic coordinates (polygon) in Verra_665.pdf
+- There is no KML on Verra website
+- It was a CDM project before
+
+
+Verra_70
+- Changed the Credit period from "01/04/2021 - 31/03/2028" to "01/01/2008 - 31/03/2028" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+- It was a CDM project before
+
+
+Verra_708
+- There are geographic coordinates (points) in Verra_708.pdf
+- Changed the Credit period fr	om "01/07/2019 - 30/06/2029" to "01/07/2009 - 30/06/2029" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_78
+- There is a geographic coordinate (point) in Verra_78.pdf
+- Changed the Credit period from "01/01/2022 - 31/12/2031" to "01/01/2002 - 31/12/2031" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_81
+- There is absolutely no files or further information on this project
+- Changed the Credit period from "01/12/2021 - 30/11/2028" to "01/12/2001 - 30/11/2028" do to inconsistencies with the project's documents (we presume to be such as there is no project description pdf in the project webpage)
+
+
+Verra_83
+- There are geographic coordinates (polygons) in Verra_83.pdf
+- Changed the Credit period from "01/04/2016 - 31/03/2026" to "01/04/2006 - 31/03/2026" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+
+
+Verra_845
+- There are geographic coordinates (points) in Verra_845.pdf
+- Changed the Credit period from "01/02/2017 - 31/01/2024" to "01/02/2010 - 31/01/2024" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+- It was a CDM project before
+
+
+Verra_846
+- There are geographic coordinates (points) in Verra_846.pdf
+- Changed the Credit period from "01/04/2017 - 31/03/2024" to "01/04/2010 - 31/03/2024" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+- It was a CDM project before
+
+
+Verra_847
+- There are geographic coordinates (points) in Verra_847.pdf
+- Changed the Credit period from "01/05/2017 - 30/04/2024" to "01/05/2010 - 30/04/2024" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+- It was a CDM project before
+
+
+Verra_875
+- The property and the project has been acquired by Caraguá company. The company claims that the previous management was unable to deliver the promised improvements to the community due to price problems and instability in the carbon market. Now the new management is committed to resolving possible previous problems, without describing them openly.
+
+
+Verra_878
+- There are geographic coordinates (points) in Verra_878.pdf
+- The project claims that it will not have a fixed period 
+- It was a CDM project before
+
+
+Verra_889
+- There are geographic coordinates (points) in Verra_889.pdf
+- Changed the Credit period from "01/05/2017 - 30/04/2024" to "01/05/2010 - 30/04/2024" do to inconsistencies with the project's documents (Verra shows the period of the last renewal and not the entire time)
+- It was a CDM project before
+
+
+Verra_896
+- There is a geographic coordinate (point) in Verra_896.pdf
+
+
+Verra_897
+- There is a geographic coordinate (point) in Verra_897.pdf
+- It was a CDM project before
+
+
+Verra_943
+- There are geographic coordinates (polygon) in Verra_943.pdf
+
+
+Verra_977
+- Verra_981 and Verra_977 are very alike (75% equality in the project proposal)
+- Ecosystem Services LLC made Verra_981 and Verra_977
+- Michael Edward Greene is the proponent of the 4 projects in Portel - PA
+- Changed the Credit period from "01/01/2019 - 31/12/2058" to "01/01/2009 - 31/12/2048" do to inconsistencies with the project's documents (in my honest opinion, the Verra website developers just maybe a high typo adding 10 years ahead to the project - both in the start and end period)
+- The project is "On Hold" on Verra, do to Verra making a project review report - Verra received stakeholder comments concerning the project
+- One paper from WRM (World Rainforest Movement) advocates that the community's benefits from the project are false (cookstoves that are not used, and false claims of tenure in lands) while the project uses state project within its boundary
+
+
+Verra_981
+- Verra_981 and Verra_977 are very alike (75% equality in the project proposal)
+- Ecosystem Services LLC made Verra_981 and Verra_977
+- Michael Edward Greene is the proponent of the 4 projects in Portel - PA
+- The project is "On Hold" on Verra, do to Verra making a project review report - Verra received stakeholder comments concerning the project
+- One paper from WRM (World Rainforest Movement) advocates that the community's benefits from the project are false (cookstoves that are not used, and false claims of tenure in lands) while the project uses state project within its boundary
+
+
+Verra_1260
+- The project has never sold credits - No vintage
+
+
+Verra_2465
+- There is no KML on Verra website
+
+
+Verra_738
+- The project has never sold credits - No vintage
+
+
+Verra_1995
+- There exist a KML file in the Verra registry
+- No issues made yet 
+
+
+Verra_1142
+- There exist a KML file in the Verra registry
+
+
+Verra_2018
+- There exist a KML file in the Verra registry
+- No issues made yet
+
+
+Verra_2021
+- There exist a KML file in the Verra registry
+- No issues made yet
+
+
+Verra_2998
+- There are geographic coordinates (points) in Verra_2998.pdf
+
+
+Verra_3056
+- There are geographic coordinates (points) in Verra_2998.pdf
+
+
+Verra_3448
+- There is a geographic coordinate (point) in Verra_3448.pdf
+
+
+Verra_1686
+- The project won the Best Individual Offsetting Project Award in Environmental Finance's Voluntary
+Carbon 2020 awards
+
+
+Verra_1147
+- The project is consider as a Reserva Particular de Desenvolvimento Sustentável (RPDS)
+
+
+Verra_1118
+- The project was put on Hold in 2014/2015 because of illegal mining during the period
+
+
+Verra_1027
+- There is no KML on Verra website
+
+
+Verra_1596
+- There is no KML on Verra website
+
+
+Verra_2790
+- There is no KML on Verra website 
+
+
+Verra_2980
+- There is no KML on Verra website
+
+
+Verra_3141
+- The project has upload the reference area
+
+
+Verra_3166
+- There is no KML on Verra website
+
+
+Verra_3798
+- There is a KML on Verra website
+
+
+Verra_2980
+- Area in Verra Registry is wrong (1 hectare)
+
+
+Verra_3332
+- The KML file (Shapefile) covers all possible placements of the project - covers good amount of Legal Amazon
+
+
+Verra_3380
+- The KML file (Shapefile) covers all possible placements of the project - covers good amount of Legal Amazon
+
+
+Verra_3746
+- The KML file (Shapefile) covers all possible placements of the project - covers 23 states
+
+
+Verra_3743
+- The KML file (Shapefile) covers all possible placements of the project - covers 23 states
+
+
+Verra_3772
+- The project covers all possible placements of the project - covers 9 states
+- The KML file shows just the first location in MA
+
+
+Verra_4117
+- The project is placed over three States, two of them out ot Legal Amazon (drop them from the dataset?)
+
+
+Verra_4131
+- There is a KML file on Verra website
+
+
+Verra_4143
+- Project's KML is not correct, not showing the actual project
+
+
+Verra_4165
+- Project 4165 is a REDD+, but the CCB certification is defined is "Afforestation, Reforestation and Revegetation"
+- There is no KML on Verra website
+
+
+Verra_4221
+- There is no KML on Verra website
+
+
+Verra_4461
+- Area of the project on Verra website is wrong
+
+
+Verra_4593
+- There is a KML file on Verra website
+

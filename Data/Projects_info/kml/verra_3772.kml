@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>PA_060.kmz</name>
+	<Style id="PolyStyle002">
+		<LabelStyle>
+			<color>00000000</color>
+			<scale>0</scale>
+		</LabelStyle>
+		<LineStyle>
+			<color>ff0000ff</color>
+			<width>4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>ff0000ff</color>
+			<fill>0</fill>
+		</PolyStyle>
+	</Style>
+	<Style id="PolyStyle0020">
+		<LabelStyle>
+			<color>00000000</color>
+			<scale>0</scale>
+		</LabelStyle>
+		<LineStyle>
+			<color>ff0000ff</color>
+			<width>4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>ff0000ff</color>
+			<fill>0</fill>
+		</PolyStyle>
+	</Style>
+	<StyleMap id="PolyStyle0021">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#PolyStyle002</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#PolyStyle0020</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Placemark id="ID_00000">
+		<name>PA_060</name>
+		<Snippet maxLines="0"></Snippet>
+		<description><![CDATA[<html xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+
+<head>
+
+<META http-equiv="Content-Type" content="text/html">
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+</head>
+
+<body style="margin:0px 0px 0px 0px;overflow:auto;background:#FFFFFF;">
+
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-collapse:collapse;padding:3px 3px 3px 3px">
+
+<tr style="text-align:center;font-weight:bold;background:#9CBCE2">
+
+<td>MA-2106326-3E38E720ABC94486A8B12C806AD32BA5</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+<table style="font-family:Arial,Verdana,Times;font-size:12px;text-align:left;width:100%;border-spacing:0px; padding:3px 3px 3px 3px">
+
+<tr>
+
+<td>FID</td>
+
+<td>0</td>
+
+</tr>
+
+<tr bgcolor="#D4E4F3">
+
+<td>COD_IMOVEL</td>
+
+<td>MA-2106326-3E38E720ABC94486A8B12C806AD32BA5</td>
+
+</tr>
+
+<tr>
+
+<td>NUM_AREA</td>
+
+<td>18402,526031</td>
+
+</tr>
+
+<tr bgcolor="#D4E4F3">
+
+<td>COD_ESTADO</td>
+
+<td>MA</td>
+
+</tr>
+
+<tr>
+
+<td>NOM_MUNICI</td>
+
+<td>MaracaÃ§umÃ©</td>
+
+</tr>
+
+<tr bgcolor="#D4E4F3">
+
+<td>NUM_MODULO</td>
+
+<td>245,3671</td>
+
+</tr>
+
+<tr>
+
+<td>TIPO_IMOVE</td>
+
+<td>IRU</td>
+
+</tr>
+
+<tr bgcolor="#D4E4F3">
+
+<td>SITUACAO</td>
+
+<td>PE</td>
+
+</tr>
+
+<tr>
+
+<td>CONDICAO_I</td>
+
+<td>Analisado com pendÃªncias, aguardando retificaÃ§Ã£o e/ou apresentaÃ§Ã£o de</td>
+
+</tr>
+
+<tr bgcolor="#D4E4F3">
+
+<td>AREA</td>
+
+<td>18402,526031</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+</table>
+
+</body>
+
+</html>]]></description>
+		<styleUrl>#PolyStyle0021</styleUrl>
+		<MultiGeometry>
+			<Polygon>
+				<outerBoundaryIs>
+					<LinearRing>
+						<coordinates>
+							-45.968508304774,-2.02989255560496,0 -45.9410367379377,-1.99474095692837,0 -45.9397035869325,-1.99705299958264,0 -45.93611770903699,-2.00341559760317,0 -45.92935838099219,-2.01555856622148,0 -45.9290552592093,-2.01610109805647,0 -45.92512554474821,-2.01231226080937,0 -45.9208984595033,-2.0112207975477,0 -45.91461764945279,-2.00167150715673,0 -45.91525973619059,-1.99701859456624,0 -45.9199800998058,-1.99093946596901,0 -45.91478586921239,-1.9807375688816,0 -45.9081280170014,-1.97880044375488,0 -45.9110634064173,-1.96729090910222,0 -45.908106366013,-1.96089938476419,0 -45.90398767196151,-1.9572321993888,0 -45.9065594466436,-1.95164624293358,0 -45.9045163681138,-1.95065506819148,0 -45.9028138485502,-1.94463849884674,0 -45.90369086167989,-1.94207896972533,0 -45.9063541128424,-1.93353781265457,0 -45.9013551361511,-1.93073177079832,0 -45.8943457884556,-1.93471425120591,0 -45.8950117419383,-1.92343601488454,0 -45.8952377576837,-1.91767002487046,0 -45.8883813094742,-1.91197175137836,0 -45.88960439417491,-1.90095148644172,0 -45.8888900122491,-1.88622899729933,0 -45.88520438271231,-1.88127742406846,0 -45.889027242814,-1.87874284503007,0 -45.8818961841182,-1.87303672283042,0 -45.8813727621302,-1.86742650286171,0 -45.8832990470305,-1.86110073593084,0 -45.90754876958981,-1.84562900886869,0 -45.9656228407302,-1.80818183526749,0 -45.9763711326363,-1.80100273296699,0 -45.9884650924208,-1.83987478031358,0 -46.0044439915576,-1.89087781314855,0 -45.9891788052275,-1.91230379952128,0 -45.979439967524,-1.92616935552357,0 -45.979029812855,-1.92675633671688,0 -45.9719173616479,-1.93935898363061,0 -45.9677258288827,-1.94685693281721,0 -45.9558480618831,-1.96805050293453,0 -45.95403307609489,-1.97127937996869,0 -45.95124036651481,-1.97623214245073,0 -45.9452411835463,-1.98715717356336,0 -45.9533814493675,-1.99772787242999,0 -45.96357522807651,-1.98892442090364,0 -45.9798506325437,-2.00826072396448,0 -45.9762039551394,-2.01219811120658,0 -45.9756788125756,-2.01286123844854,0 -45.97471515902409,-2.01455029458643,0 -45.968508304774,-2.02989255560496,0 
+						</coordinates>
+					</LinearRing>
+				</outerBoundaryIs>
+			</Polygon>
+		</MultiGeometry>
+	</Placemark>
+</Document>
+</kml>
