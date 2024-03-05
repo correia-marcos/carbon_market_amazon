@@ -1,7 +1,7 @@
 # =============================================================================
 # Dissertation: Can carbon market protect the Amazon: Evidence from Brazil
 # =============================================================================
-# Goal: Complete information about carbon projects
+# Goal: Collect more information about carbon projects
 # 
 # We already create a dataset with virtually all carbon offsets in Brazil. Now,
 # we want to open all excel files from Data/Projects_info/Issuances in order to
