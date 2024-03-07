@@ -1,17 +1,14 @@
 # =============================================================================
 # Dissertation: Can carbon market save the Amazon: Evidence from Brazil
 # =============================================================================
-# Goal: Estimate synthetic controls
-# 
-# In the last programs, we created ever information we need for the first
+# @Goal: Estimate synthetic controls
+# @Description: In the last programs, we created ever information we need for the first
 # synthetic control estimation! Now, we attempt to estimate it, using scpi
 # library. Please check: https://cran.r-project.org/web/packages/scpi/scpi.pdf
-# 
-# This program is made to:
+# @summary: This program intends to create
 #   0 - Short data processing (merging datasets and create new one) 
 #   1 - Function to apply synthetic control
 #   2 - Figure of results
-# 
 # @Date: out 2023
 # @author: Marcos
 
