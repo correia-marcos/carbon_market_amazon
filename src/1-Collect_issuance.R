@@ -32,12 +32,12 @@ data <- readxl::read_excel("Data/Projects_info/base_projects.xlsx",
 issues_files <- list.files("Data/Projects_info/Issuances", full.names = TRUE)
 
 # Function --------------------------------------------------------------------
-# written on: 11/12/2023
-# written by: Marcos Paulo
-# Input     : Vector with full name of the excel files
-# Output    : Dataframe with 5 columns in a tidy data format
-# purpose   : Read project issues, process it and create a tidy version by year
-# desc      : We used information in issues datasets to collect information
+# @written_on: 11/12/2023
+# @written_by: Marcos Paulo
+# @Input     : Vector with full name of the excel files
+# @Output    : Dataframe with 5 columns in a tidy data format
+# @purpose   : Read project issues, process it and create a tidy version by year
+# @desc      : We used information in issues datasets to collect information
 # about issues amount, year of vintage, year of crediting, year of retirement,
 # and ID. We then create a tidy dataframe containing year, ID, and credits
 process_project_info <- function(file_path) {
@@ -84,12 +84,12 @@ process_project_info <- function(file_path) {
 }
 
 # Function --------------------------------------------------------------------
-# written on: 12/12/2023
-# written by: Marcos Paulo
-# input     : Dataframe and a list of Excel files to loop over
-# output    : Dataframe with those columns specific columns modified 
-# purpose   : Read project issues, save certifications and add info into df
-# desc      : We used information in issues datasets to collect information
+# @written_on: 12/12/2023
+# @written_by: Marcos Paulo
+# @input     : Dataframe and a list of Excel files to loop over
+# @output    : Dataframe with those columns specific columns modified 
+# @purpose   : Read project issues, save certifications and add info into df
+# @desc      : We used information in issues datasets to collect information
 # about the type of certification a project has. Once we collect all unique
 # certifications, we mutate the value of a column representing that
 # certification to 1 and 0 otherwise. The function goes over all Excel files

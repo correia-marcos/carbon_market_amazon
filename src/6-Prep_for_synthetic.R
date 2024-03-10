@@ -24,7 +24,7 @@ rm(list = ls())
 library(groundhog)            # You need to have at least R version = 4.3.1
 
 # Required packages 
-pkgs <- c("ggplot2", "haven", "foreign", "dplyr", "sf", "sp", "scpi")
+pkgs <- c("haven", "foreign", "dplyr", "sf", "sp", "scpi")
 
 # Load packages
 groundhog.library(pkgs, "2023-09-01")
@@ -55,7 +55,7 @@ order_redd <- c("id", "year",
 # property information (only Hydrography information) and is the only project
 # that contains the class 32 of vegetation
 
-# Remove column "X" from coverage data and change column positions
+# Remove column "X" from coverage data, change column positions and arrange it
 coverage_car <- coverage_car[, -which(names(coverage_car) == "X")] %>% 
   dplyr::select(all_of(order_car)) %>%
   arrange(id, year)
@@ -125,7 +125,7 @@ coverage_car_pctg <- coverage_car_pctg %>%
   # Calculate percentage of other columns
   mutate(
     Forest_pctg = Forest / (rowSums(.[, 3:8])),
-    Other_natural_formation_pctg =  Other_natural_formation / (rowSums(.[, 3:8])),
+    Other_natural_formation_pctg= Other_natural_formation / (rowSums(.[, 3:8])),
     Farming_pctg =  Farming / (rowSums(.[, 3:8])),
     Non_vegetated_area_pctg =  Non_vegetated_area / (rowSums(.[, 3:8])),
     Water_pctg =  Water / (rowSums(.[, 3:8])),
@@ -158,20 +158,28 @@ projects <- projects %>%
 
 # Creating final datasets
 final_car_raw <- coverage_car_reduced %>%
-  left_join(projects, by = "id_rgst")
+  left_join(projects, by = "id_rgst") %>%
+  dplyr::select(-geometry)
+
 final_car_pctg <- coverage_car_pctg %>%
-  left_join(projects, by = "id_rgst")
+  left_join(projects, by = "id_rgst") %>%
+  dplyr::select(-geometry)
+
 final_redd_raw <- coverage_redd_reduced %>% 
-  left_join(projects, by = "id_rgst")
+  left_join(projects, by = "id_rgst") %>%
+  dplyr::select(-geometry)
+
 final_redd_pctg <- coverage_redd_pctg %>% 
-  left_join(projects, by = "id_rgst")
+  left_join(projects, by = "id_rgst") %>%
+  dplyr::select(-geometry)
+
 
 # Saving results
-write.csv2(coverage_car_reduced, file = "Results/Final_base/final_car_raw.csv",
+write.csv2(final_car_raw, file = "Results/Final_base/final_car_raw.csv",
            row.names = FALSE)
-write.csv2(coverage_car_pctg, file = "Results/Final_base/final_car_pctg.csv",
+write.csv2(final_car_pctg, file = "Results/Final_base/final_car_pctg.csv",
            row.names = FALSE)
-write.csv2(coverage_redd_reduced, file = "Results/Final_base/final_redd_raw.csv",
+write.csv2(final_redd_raw, file = "Results/Final_base/final_redd_raw.csv",
            row.names = FALSE)
-write.csv2(coverage_redd_pctg, file = "Results/Final_base/final_redd_pctg.csv",
+write.csv2(final_redd_pctg, file = "Results/Final_base/final_redd_pctg.csv",
            row.names = FALSE)

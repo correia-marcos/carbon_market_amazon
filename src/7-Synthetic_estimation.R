@@ -2,9 +2,12 @@
 # Dissertation: Can carbon market save the Amazon: Evidence from Brazil
 # =============================================================================
 # @Goal: Estimate synthetic controls
-# @Description: In the last programs, we created ever information we need for the first
-# synthetic control estimation! Now, we attempt to estimate it, using scpi
-# library. Please check: https://cran.r-project.org/web/packages/scpi/scpi.pdf
+# 
+# @Description: In the last programs, we created ever information we need for
+# the first synthetic control estimation! Now, we attempt to estimate it,
+# using scpi library. Please check: 
+# https://cran.r-project.org/web/packages/scpi/scpi.pdf
+# 
 # @summary: This program intends to create
 #   0 - Short data processing (merging datasets and create new one) 
 #   1 - Function to apply synthetic control
@@ -28,82 +31,108 @@ groundhog.library(pkgs, "2023-09-01")
 # Import the required datasets
 final_car <- read.csv2("Results/Final_base/final_car_pctg.csv")
 final_redd <- read.csv2("Results/Final_base/final_redd_pctg.csv")
-projects <- sf::st_read("Results/base_afolu_complete")
-
-# Converting id_rgst column from projects to integer
-projects <- projects %>%
-  mutate(id_rgst = as.integer(id_rgst))
-
-# Creating final datasets
-car_complete <- final_car %>%
-  left_join(projects, by = "id_rgst") %>%
-  dplyr::select(-geometry)
-
-redd_complete <- final_redd %>% 
-  left_join(projects, by = "id_rgst") %>%
-  dplyr::select(-geometry)
 
 # Defining treatment: year >= year(start) and month is not in last trimester
-redd_treated <- redd_complete %>%
+redd_treated_operation <- final_redd %>%
   filter(prj_stt %in% c("Registered", "On Hold")) %>% 
   mutate(
+    final_trimester = quarter(start) == 4, # Check if "start" is in last tri
     treatment = if_else(
-      year >= year(start) & 
-        (month(start) < 10 | (month(start) == 10 & day(start) <= 20)),
+      final_trimester & year > year(start), # Last tri and "year" > year of "start"
       1,
-      0
+      if_else(
+        !final_trimester & year >= year(start), # Not last tri and "year" >= year of "start"
+        1,
+        0
+      )
     )
-  )
+  ) %>%
+  dplyr::select(-final_trimester) # Remove final_trimester column
 
-car_treated <- car_complete %>%
+redd_treated_registered <- final_redd %>%
   filter(prj_stt %in% c("Registered", "On Hold")) %>% 
   mutate(
+    final_trimester = quarter(crtfctn) == 4, # Check if "crtfctn" is in last tri
     treatment = if_else(
-      year >= year(start) & 
-        (month(start) < 10 | (month(start) == 10 & day(start) <= 20)),
+      final_trimester & year > year(crtfctn), # Last tri and "year" > year of "crtfctn"
       1,
-      0
+      if_else(
+        !final_trimester & year >= year(crtfctn), # Not last tri and "year" >= "crtfctn"
+        1,
+        0
+      )
     )
-  )
+  ) %>%
+  dplyr::select(-final_trimester) # Remove final_trimester column
+
+  
+car_treated_operation <- final_car %>%
+  filter(prj_stt %in% c("Registered", "On Hold")) %>% 
+  mutate(
+    final_trimester = quarter(start) == 4, # Check if "start" is in last tri
+    treatment = if_else(
+      final_trimester & year > year(start), # Last tri and "year" > year of "start"
+      1,
+      if_else(
+        !final_trimester & year >= year(start), # Not last tri and "year" >= year of "start"
+        1,
+        0
+      )
+    )
+  ) %>%
+  dplyr::select(-final_trimester) # Remove final_trimester column
+
+
+car_treated_registered <- final_car %>%
+  filter(prj_stt %in% c("Registered", "On Hold")) %>% 
+  mutate(
+    final_trimester = quarter(crtfctn) == 4, # Check if "crtfctn" is in last tri
+    treatment = if_else(
+      final_trimester & year > year(crtfctn), # Last tri and "year" > year of "crtfctn"
+      1,
+      if_else(
+        !final_trimester & year >= year(crtfctn), # Not last tri and "year" >= "crtfctn"
+        1,
+        0
+      )
+    )
+  ) %>%
+  dplyr::select(-final_trimester) # Remove final_trimester column
+
 
 # Defining control: all projects that are not Registered or On Hold yet
-redd_control <- redd_complete %>%
+redd_control <- final_redd %>%
   filter(!prj_stt %in% c("Registered", "On Hold")) %>% 
   mutate(treatment = 0)
 
-car_control <- car_complete %>%
+car_control <- final_car %>%
   filter(!prj_stt %in% c("Registered", "On Hold")) %>% 
   mutate(treatment = 0)
 
 
+
+# =============================================================================
+# =============================================================================
+# Synthetic control estimation for AUD (avoided unplanned deforestation) REDD+
+# Treatment: REDD+ AUD projects year of operation 
+# Donors: REDD+ AUD projects not yet registered
 # =============================================================================
 # =============================================================================
 # Defining the Final dataset: data
-# Treatment: REDD+ projects
-# Control: REDD+ projects not yet treated
-# =============================================================================
-# =============================================================================
-data <- bind_rows(redd_treated, redd_control)
+data <- bind_rows(redd_treated_operation, redd_control)
 
 # Create new column based on the sum of Forest and Non Forest Natural Formation
 data <- data %>% 
   mutate(Total_natural_formation = Forest_pctg + Other_natural_formation_pctg)
 
-# =============================================================================
-# =============================================================================
-# Synthetic control estimation for AUD (avoided unplanned deforestation) REDD+
-# Treatment: REDD+ AUD projects already treated 
-# Donors: REDD+ AUD projects not yet registered
-# =============================================================================
-# =============================================================================
 # Filter AUD projects
 data_aud <- data %>%
   filter(rdd_typ == "AUD")
 
-# Identify donors with no/low variation - reducion donor pool may be important
+# Identify donors with no/low variation - reduction donor pool may be important
 donors_no_var <- data_aud %>%
   group_by(id_rgst) %>%
-  filter(diff(range(Total_natural_formation)) <= 0.0005) %>% # 0.0005 with full year
+  filter(diff(range(Total_natural_formation)) <= 0.0001) %>% # 0.0005 all time
   distinct(id_rgst) %>%
   ungroup() %>% 
   pull(id_rgst)
@@ -122,7 +151,6 @@ result_aud <- scest(df_aud, w.constr = list("name" = "simplex"))
 
 # Plotting
 plots <- scplotMulti(result_aud, e.out = TRUE, ncols = 6)
-dev.new(width = 1000, height = 330, unit = "px")
 plots
 
 # Get the Prediction Intervals for Synthetic Control Methods
@@ -138,10 +166,16 @@ scplotMulti(respi, type = "series", joint = TRUE)
 # =============================================================================
 # =============================================================================
 # Synthetic control estimation for APD (Avoided planned deforestation) REDD+
-# Treatment: REDD+ APD projects already treated 
+# Treatment: REDD+ APD projects year of operation 
 # Donors: REDD+ APD projects not yet registered
 # =============================================================================
 # =============================================================================
+# Defining the Final dataset: data
+data <- bind_rows(redd_treated_registered, redd_control)
+
+# Create new column based on the sum of Forest and Non Forest Natural Formation
+data <- data %>% 
+  mutate(Total_natural_formation = Forest_pctg + Other_natural_formation_pctg)
 
 # Filter APD projects
 data_apd <- data %>% 
@@ -150,7 +184,7 @@ data_apd <- data %>%
 # Identify donors with no variation
 donors_no_var <- data_apd %>%
   group_by(id_rgst) %>%
-  filter(diff(range(Total_natural_formation)) <= 0.0005) %>%
+  filter(diff(range(Total_natural_formation)) <= 0.00001)%>%
   distinct(id_rgst) %>%
   ungroup() %>% 
   pull(id_rgst)
@@ -161,7 +195,7 @@ data_apd <- data_apd[!data_apd$id_rgst %in% donors_no_var, ]
 # =============================================================================
 # Unit time treatment effect (\tau_{ik}) preparation fo AUD projects
 df_apd <- scdataMulti(data_apd, id.var = "id_rgst",
-                      outcome.var = "Forest_pctg",
+                      outcome.var = "Total_natural_formation",
                       treatment.var = "treatment",
                       time.var = "year", constant = TRUE,
                       cointegrated.data = TRUE)

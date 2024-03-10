@@ -31,12 +31,14 @@ sf_use_s2(FALSE)
 
 # Load the required datasets
 projects <- sf::st_read("Results/base_afolu_complete")
-legend <- read.csv("Data/Deforestation/Codigos-da-legenda-colecao-8.csv",
-                   sep = ';')
 data_car <- st_read("Results/CAR_redd_atlas/")
 
 # Change projects data frame column name
 colnames(projects)[1] <- 'id'
+
+# Filter for REDD+ projects
+projects_redd <- projects %>%
+  filter(prj_typ == "REDD+")
 
 # Specify the directory path and regular expression pattern for matching files
 directory_path <- "Data/Deforestation/"
@@ -49,12 +51,12 @@ raster_files <- list.files(path = directory_path,
 raster_list = lapply(raster_files, raster)
 
 # Function --------------------------------------------------------------------
-# written on: 12/01/2024
-# written by: Marcos Paulo
-# Input     : List of raster files and dataframe of land tenure spatial data
-# Output    : Dataframe with +- 40 columns with coverage land use, id and year
-# purpose   : Get the coverage land use of properties in IMAFLORA dataset
-# desc      : The function works in following way:
+# @written_on: 12/01/2024
+# @written_by: Marcos Paulo
+# @Input     : List of raster files and dataframe of land tenure spatial data
+# @Output    : Dataframe with +- 40 columns with coverage land use, id and year
+# @purpose   : Get the coverage land use of properties in IMAFLORA dataset
+# @desc      : The function works in following way:
 # - for each raster file variable (one for each year) - i
 #   - for each property in the land tenure dataset - j
 #       - Do processing to get all the coverage usage of the properties in a 
@@ -113,7 +115,7 @@ land_coverage_car <- get_coverage_properties(list_of_rast_files = raster_list,
                                              data_land_tenure = data_car)
 
 land_coverage_redd <- get_coverage_properties(list_of_rast_files = raster_list,
-                                              data_land_tenure = projects)
+                                              data_land_tenure = projects_redd)
 
 # Save files
 write.csv2(land_coverage_car,
@@ -125,6 +127,4 @@ write.csv2(land_coverage_redd,
 # erros
 # =====================
 
-erros <- filter(coverage_redd, !is.na(X32))
 
-erros_car <- filter(data_car, id_rgst == unique(erros$id)) 

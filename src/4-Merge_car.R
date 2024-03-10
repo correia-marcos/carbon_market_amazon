@@ -1,7 +1,7 @@
 # =============================================================================
 # Dissertation: Can carbon market save the Amazon: Evidence from Brazil
 # =============================================================================
-# Goal: Merge the Cadastro Ambiental Rural (CAR) information with project info
+# @Goal: Merge the Cadastro Ambiental Rural (CAR) information with project info
 # 
 # In the second script, we generated a spatial dataset containing all AFOLU
 # projects in Brazil. We want now to collect the CAR info of these projects
@@ -65,14 +65,12 @@ for (state in states){
   # Replace the geometry in the merged result with the geometry from 'car'
   intersections$geometry <- st_geometry(car[match(intersections$id, car$id), ])
 
-  # Filter lines in the CAR dataset
-  # car_reduced <- car[match(intersections$id, car$id), ]
-  
   # Add merged dataset to new dataframe
   projects_car <- rbind(projects_car, intersections)
 }
+
 # Before saving it, make sure to check if the df only contains polygons
-projects_car_new <- st_cast(projects_car, "POLYGON") # need to resolve issue!
+# projects_car_new <- st_cast(projects_car, "POLYGON") # need to resolve issue!
 
 # Saving file
 st_write(projects_car, "Results/CAR_redd_atlas", driver = "ESRI Shapefile",
