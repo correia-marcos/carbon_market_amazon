@@ -47,3 +47,9 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Large files from Data
+/Data/Amazon_info
+/Data/ATLAS
+/Data/CAR
+/Data/Land_coverage
