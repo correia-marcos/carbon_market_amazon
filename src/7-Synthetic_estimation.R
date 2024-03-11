@@ -44,10 +44,9 @@ redd_treated_operation <- final_redd %>%
       false = if_else(
         !final_trimester & year >= year(start),
         true = 1,
-        false = 0
+        false = 0)
       )
-    )
-  ) %>%
+    , .after  = year) %>%
   dplyr::select(-final_trimester) # Remove final_trimester column
 
 redd_treated_registered <- final_redd %>%
@@ -60,10 +59,9 @@ redd_treated_registered <- final_redd %>%
       if_else(
         !final_trimester & year >= year(crtfctn), # Not last tri and "year" >= "crtfctn"
         1,
-        0
-      )
+        0)
     )
-  ) %>%
+    , .after  = year) %>%
   dplyr::select(-final_trimester) # Remove final_trimester column
 
   
@@ -77,10 +75,9 @@ car_treated_operation <- final_car %>%
       if_else(
         !final_trimester & year >= year(start), # Not last tri and "year" >= year of "start"
         1,
-        0
-      )
+        0)
     )
-  ) %>%
+    , .after  = year) %>%
   dplyr::select(-final_trimester) # Remove final_trimester column
 
 
@@ -94,10 +91,9 @@ car_treated_registered <- final_car %>%
       if_else(
         !final_trimester & year >= year(crtfctn), # Not last tri and "year" >= "crtfctn"
         1,
-        0
-      )
+        0)
     )
-  ) %>%
+    , .after  = year) %>%
   dplyr::select(-final_trimester) # Remove final_trimester column
 
 # Avoiding anticipation issues - defining treatment 2 years before the treatment
@@ -111,10 +107,9 @@ redd_treated_no_antecipation <- final_redd %>%
       false = if_else(
         !final_trimester & year >= year(start) - 2,
         true = 1,
-        false = 0
-      )
+        false = 0)
     )
-  ) %>%
+    , .after  = year) %>%
   dplyr::select(-final_trimester) # Remove final_trimester column
 
 car_treated_no_antecipation <- final_car %>%
@@ -127,20 +122,19 @@ car_treated_no_antecipation <- final_car %>%
       false = if_else(
         !final_trimester & year >= year(start) - 2,
         true = 1,
-        false = 0
-      )
+        false = 0)
     )
-  ) %>%
+    , .after  = year) %>%
   dplyr::select(-final_trimester) # Remove final_trimester column
 
 # Defining control: all projects that are not Registered or On Hold yet
 redd_control <- final_redd %>%
   filter(!prj_stt %in% c("Registered", "On Hold")) %>% 
-  mutate(treatment = 0)
+  mutate(treatment = 0, .after = year)
 
 car_control <- final_car %>%
   filter(!prj_stt %in% c("Registered", "On Hold")) %>% 
-  mutate(treatment = 0)
+  mutate(treatment = 0, .after = year)
 
 # =============================================================================
 # =============================================================================
@@ -150,11 +144,12 @@ car_control <- final_car %>%
 # =============================================================================
 # =============================================================================
 # Defining the Final dataset: data
-data <- bind_rows(car_treated_operation, car_control)
+data <- bind_rows(redd_treated_operation, redd_control)
 
 # Create new column based on the sum of Forest and Non Forest Natural Formation
 data <- data %>% 
-  mutate(Total_natural_formation = Forest_pctg + Other_natural_formation_pctg)
+  mutate(Total_natural_formation = Forest_pctg + Other_natural_formation_pctg,
+         .after = treatment)
 
 # Filter AUD projects
 data_aud <- data %>%
@@ -313,7 +308,8 @@ data <- bind_rows(redd_treated_no_antecipation, redd_control)
 
 # Create new column based on the sum of Forest and Non Forest Natural Formation
 data <- data %>% 
-  mutate(Total_natural_formation = Forest_pctg + Other_natural_formation_pctg)
+  mutate(Total_natural_formation = Forest_pctg + Other_natural_formation_pctg,
+         .after = treatment)
 
 # Filter AUD projects
 data_aud <- data %>%
@@ -333,7 +329,7 @@ data_aud <- data_aud[!data_aud$id_rgst %in% donors_no_var, ]
 
 # Unit time treatment effect (\tau_{ik}) preparation fo AUD projects
 df_aud <- scdataMulti(data_aud, id.var = "id_rgst",
-                      outcome.var = "",
+                      outcome.var = "Total_natural_formation",
                       treatment.var = "treatment",
                       time.var = "year", constant = TRUE)
 
