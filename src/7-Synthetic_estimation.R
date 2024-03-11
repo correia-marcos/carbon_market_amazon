@@ -12,6 +12,7 @@
 #   0 - Short data processing (merging datasets and create new one) 
 #   1 - Function to apply synthetic control
 #   2 - Figure of results
+# 
 # @Date: out 2023
 # @author: Marcos
 
@@ -38,12 +39,12 @@ redd_treated_operation <- final_redd %>%
   mutate(
     final_trimester = quarter(start) == 4, # Check if "start" is in last tri
     treatment = if_else(
-      final_trimester & year > year(start), # Last tri and "year" > year of "start"
-      1,
-      if_else(
-        !final_trimester & year >= year(start), # Not last tri and "year" >= year of "start"
-        1,
-        0
+      final_trimester & year > year(start), # Last tri and year > year of "start"
+      true = 1,
+      false = if_else(
+        !final_trimester & year >= year(start),
+        true = 1,
+        false = 0
       )
     )
   ) %>%
@@ -99,6 +100,38 @@ car_treated_registered <- final_car %>%
   ) %>%
   dplyr::select(-final_trimester) # Remove final_trimester column
 
+# Avoiding anticipation issues - defining treatment 2 years before the treatment
+redd_treated_no_antecipation <- final_redd %>% 
+  filter(prj_stt %in% c("Registered", "On Hold")) %>% 
+  mutate(
+    final_trimester = quarter(start) == 4, # Check if "start" is in last tri
+    treatment = if_else(
+      final_trimester & year > year(start) - 2, # Last tri and year > year of "start"
+      true = 1,
+      false = if_else(
+        !final_trimester & year >= year(start) - 2,
+        true = 1,
+        false = 0
+      )
+    )
+  ) %>%
+  dplyr::select(-final_trimester) # Remove final_trimester column
+
+car_treated_no_antecipation <- final_car %>%
+  filter(prj_stt %in% c("Registered", "On Hold")) %>% 
+  mutate(
+    final_trimester = quarter(start) == 4, # Check if "start" is in last tri
+    treatment = if_else(
+      final_trimester & year > year(start) - 2, # Last tri and year > year of "start"
+      true = 1,
+      false = if_else(
+        !final_trimester & year >= year(start) - 2,
+        true = 1,
+        false = 0
+      )
+    )
+  ) %>%
+  dplyr::select(-final_trimester) # Remove final_trimester column
 
 # Defining control: all projects that are not Registered or On Hold yet
 redd_control <- final_redd %>%
@@ -109,8 +142,6 @@ car_control <- final_car %>%
   filter(!prj_stt %in% c("Registered", "On Hold")) %>% 
   mutate(treatment = 0)
 
-
-
 # =============================================================================
 # =============================================================================
 # Synthetic control estimation for AUD (avoided unplanned deforestation) REDD+
@@ -119,7 +150,7 @@ car_control <- final_car %>%
 # =============================================================================
 # =============================================================================
 # Defining the Final dataset: data
-data <- bind_rows(redd_treated_operation, redd_control)
+data <- bind_rows(car_treated_operation, car_control)
 
 # Create new column based on the sum of Forest and Non Forest Natural Formation
 data <- data %>% 
@@ -142,7 +173,7 @@ data_aud <- data_aud[!data_aud$id_rgst %in% donors_no_var, ]
 
 # Unit time treatment effect (\tau_{ik}) preparation fo AUD projects
 df_aud <- scdataMulti(data_aud, id.var = "id_rgst",
-                      outcome.var = "Total_natural_formation",
+                      outcome.var = "Forest_pctg",
                       treatment.var = "treatment",
                       time.var = "year", constant = TRUE)
 
@@ -156,6 +187,32 @@ plots
 # Get the Prediction Intervals for Synthetic Control Methods
 respi <- scpi(df_aud, w.constr = list("name" = "simplex"), cores = 3, sims = 10,
               rho = "type-1", e.method = "gaussian", rho.max = 0.5)
+
+# plot series
+scplotMulti(respi, type = "series")
+
+# plot treatment
+scplotMulti(respi, type = "series", joint = TRUE)
+
+# =============================================================================
+# get the Average treatment effect on the treated (\tau_{.k})
+
+df_aud_att <- scdataMulti(data_aud, id.var = "id_rgst",
+                          outcome.var = "Total_natural_formation",
+                          treatment.var = "treatment",
+                          time.var = "year",
+                          constant = TRUE,
+                          effect = "time")
+
+# Prediction of Synthetic Control for ATT
+result_apd_att <- scest(df_aud_att, w.constr = list("name" = "simplex"))
+
+# Plot result
+scplotMulti(result_apd_att)
+
+# Get the Prediction Intervals for Synthetic Control for ATT
+respi <- scpi(df_aud_att, w.constr = list("name" = "simplex"), cores = 3,
+              sims = 200, e.method = "gaussian")
 
 # plot series
 scplotMulti(respi, type = "series")
@@ -246,52 +303,45 @@ scplotMulti(respi, type = "series", joint = TRUE)
 
 # =============================================================================
 # =============================================================================
+# Synthetic control estimation for AUD (avoided unplanned deforestation) REDD+
+# Treatment: REDD+ AUD projects year of operation 
+# Donors: REDD+ AUD projects not yet registered
+# =============================================================================
+# =============================================================================
 # Defining the Final dataset: data
-# Treatment: REDD+ projects
-# Control: Properties of REDD+ not yet treated
-# =============================================================================
-# =============================================================================
-data <- bind_rows(redd_treated, car_control)
+data <- bind_rows(redd_treated_no_antecipation, redd_control)
 
 # Create new column based on the sum of Forest and Non Forest Natural Formation
 data <- data %>% 
   mutate(Total_natural_formation = Forest_pctg + Other_natural_formation_pctg)
 
-# =============================================================================
-# =============================================================================
-# Synthetic control estimation for AUD (avoided unplanned deforestation) REDD+
-# Treatment: REDD+ AUD projects already treated 
-# Donors: REDD+ AUD projects not yet registered
-# =============================================================================
-# =============================================================================
 # Filter AUD projects
-data_aud_car <- data %>%
-  filter(rdd_typ == "AUD")
+data_aud <- data %>%
+  filter(rdd_typ == "AUD") %>% 
+  filter(!id_rgst == 1094) # Too little pre intervention time
 
-# Identify donors with no/low variation - reducing donor pool may be important
-donors_no_var <- data_aud_car %>%
+# Identify donors with no/low variation - reduction donor pool may be important
+donors_no_var <- data_aud %>%
   group_by(id_rgst) %>%
-  filter(!prj_stt %in% c("Registered", "On Hold")) %>%
-  filter(diff(range(Total_natural_formation)) <= 0.01) %>% # 0.0005 with full year
+  filter(diff(range(Total_natural_formation)) <= 0.0001) %>% # 0.0005 all time
   distinct(id_rgst) %>%
   ungroup() %>% 
   pull(id_rgst)
 
 # Remove donors with no variation from the dataset
-data_aud_car <- data_aud_car[!data_aud_car$id_rgst %in% donors_no_var, ]
+data_aud <- data_aud[!data_aud$id_rgst %in% donors_no_var, ]
 
 # Unit time treatment effect (\tau_{ik}) preparation fo AUD projects
-df_aud_car <- scdataMulti(data_aud_car, id.var = "id_rgst",
-                        outcome.var = "Total_natural_formation",
-                        treatment.var = "treatment",
-                        time.var = "year", constant = TRUE)
+df_aud <- scdataMulti(data_aud, id.var = "id_rgst",
+                      outcome.var = "",
+                      treatment.var = "treatment",
+                      time.var = "year", constant = TRUE)
 
 # Prediction of Synthetic Control
-result_aud_car <- scest(df_aud, w.constr = list("name" = "simplex"))
+result_aud <- scest(df_aud, w.constr = list("name" = "simplex"))
 
 # Plotting
-plots <- scplotMulti(result_aud_car, e.out = TRUE, ncols = 6)
-dev.new(width = 1000, height = 330, unit = "px")
+plots <- scplotMulti(result_aud, e.out = TRUE, ncols = 6)
 plots
 
 # Get the Prediction Intervals for Synthetic Control Methods
@@ -303,17 +353,6 @@ scplotMulti(respi, type = "series")
 
 # plot treatment
 scplotMulti(respi, type = "series", joint = TRUE)
-
-
-
-
-
-
-
-
-
-
-
 
 
 

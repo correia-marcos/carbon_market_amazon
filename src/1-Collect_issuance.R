@@ -34,7 +34,7 @@ issues_files <- list.files("Data/Projects_info/Issuances", full.names = TRUE)
 # Function --------------------------------------------------------------------
 # @written_on: 11/12/2023
 # @written_by: Marcos Paulo
-# @Input     : Vector with full name of the excel files
+# @Input     : file_path is vector with full name of the excel files
 # @Output    : Dataframe with 5 columns in a tidy data format
 # @purpose   : Read project issues, process it and create a tidy version by year
 # @desc      : We used information in issues datasets to collect information
