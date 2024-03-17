@@ -53,15 +53,16 @@ min(not_registered$forest)
 # =============================================================================
 # =============================================================================
 # Create dataset for the synthetic control
+final_data <- data
 verra_1953 <- final_data %>% 
-  filter(ID == "1953")
+  filter(id_rgst == "1953")
 
 # Get the year of the beginning of the project
-treatment_year <- 2016
+treatment_year <- unique(year(verra_1953$start))
 
 # Add all donors
 verra_1953 <- rbind(verra_1953, final_data %>%
-                      filter(Treatment == 0 & REDD_type == "AUD"))
+                      filter(treatment == 0 & rdd_typ == "AUD"))
 
 # Create the outcome column: protected_land
 verra_1953 <- mutate(verra_1953, protected_land = natural_lands + forest)
@@ -78,13 +79,13 @@ verra_1953 <- verra_1953[!verra_1953$ID %in% donors_no_variation, ]
 
 ####################################
 ### Set options for data preparation
-id.var      <- "ID"                              
+id.var      <- "id_rgst"                              
 time.var    <- "year"                                 
-period.pre  <- seq(from = 2008, to = treatment_year, by = 1)    
-period.post <- seq(from = treatment_year+1, to = 2021, by = 1)                           
-unit.tr     <- "1953"                         
-unit.co     <- setdiff(unique(verra_1953$ID), unit.tr) 
-outcome.var <- "protected_land"                                  
+period.pre  <- seq(from = 2000, to = 2009, by = 1)    
+period.post <- seq(from = 2009+1, to = 2021, by = 1)                           
+unit.tr     <- "1118"                         
+unit.co     <- setdiff(unique(data_aud$id_rgst), unit.tr) 
+outcome.var <- "Total_natural_formation"                                  
 cov.adj     <- NULL                                   
 features    <- NULL                                   
 constant    <- FALSE                                  
@@ -95,7 +96,7 @@ cointegrated.data <- TRUE
 ####################################
 ### Data preparation
 
-df  <-   scdata(df = verra_1953, id.var = id.var, time.var = time.var,
+df  <-   scdata(df = data_aud, id.var = id.var, time.var = time.var,
                 outcome.var = outcome.var, period.pre = period.pre,
                 period.post = period.post, unit.tr = unit.tr,
                 unit.co = unit.co, cov.adj = cov.adj, features = features,

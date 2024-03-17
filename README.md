@@ -18,3 +18,9 @@ Packages:
 	- Here
 
 The other will be installed if needed!
+
+** Ignoring files ** 
+
+Do to large size of some files, we needed to set them in .gitignore. In the 'results' directory,
+only large 'tenure_projects_data' needed to be ignored. This is the datasets created by
+'merge_property_data.R' script. 

@@ -1,0 +1,5 @@
+results/conservation_units/* filter=lfs diff=lfs merge=lfs -text
+results/conservation_units filter=lfs diff=lfs merge=lfs -text
+results/conservation_units/conservation_units.gpkg filter=lfs diff=lfs merge=lfs -text
+results/land_coverage/* filter=lfs diff=lfs merge=lfs -text
+results/merge_property_data/* filter=lfs diff=lfs merge=lfs -text

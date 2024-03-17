@@ -8,10 +8,10 @@
 # using scpi library. Please check: 
 # https://cran.r-project.org/web/packages/scpi/scpi.pdf
 # 
-# @summary: This program intends to create
-#   0 - Short data processing (merging datasets and create new one) 
-#   1 - Function to apply synthetic control
-#   2 - Figure of results
+# @summary: This program intends to
+#   0 - Create short data processing (merging datasets and create new one) 
+#   1 - Create function to apply synthetic control
+#   2 - Create figure of results
 # 
 # @Date: out 2023
 # @author: Marcos
@@ -102,10 +102,10 @@ redd_treated_no_antecipation <- final_redd %>%
   mutate(
     final_trimester = quarter(start) == 4, # Check if "start" is in last tri
     treatment = if_else(
-      final_trimester & year > year(start) - 2, # Last tri and year > year of "start"
+      final_trimester & year > year(start) - 3, # Last tri and year > year of "start"
       true = 1,
       false = if_else(
-        !final_trimester & year >= year(start) - 2,
+        !final_trimester & year >= year(start) - 3,
         true = 1,
         false = 0)
     )
@@ -117,10 +117,10 @@ car_treated_no_antecipation <- final_car %>%
   mutate(
     final_trimester = quarter(start) == 4, # Check if "start" is in last tri
     treatment = if_else(
-      final_trimester & year > year(start) - 2, # Last tri and year > year of "start"
+      final_trimester & year > year(start) - 3, # Last tri and year > year of "start"
       true = 1,
       false = if_else(
-        !final_trimester & year >= year(start) - 2,
+        !final_trimester & year >= year(start) - 3,
         true = 1,
         false = 0)
     )
@@ -158,7 +158,7 @@ data_aud <- data %>%
 # Identify donors with no/low variation - reduction donor pool may be important
 donors_no_var <- data_aud %>%
   group_by(id_rgst) %>%
-  filter(diff(range(Total_natural_formation)) <= 0.0001) %>% # 0.0005 all time
+  filter(diff(range(Total_natural_formation)) <= 0.0005) %>% # 0.0005 all time
   distinct(id_rgst) %>%
   ungroup() %>% 
   pull(id_rgst)
@@ -167,13 +167,13 @@ donors_no_var <- data_aud %>%
 data_aud <- data_aud[!data_aud$id_rgst %in% donors_no_var, ]
 
 # Unit time treatment effect (\tau_{ik}) preparation fo AUD projects
-df_aud <- scdataMulti(data_aud, id.var = "id_rgst",
-                      outcome.var = "Forest_pctg",
-                      treatment.var = "treatment",
-                      time.var = "year", constant = TRUE)
+df_aud <- scpi::scdataMulti(data_aud, id.var = "id_rgst",
+                            outcome.var = "Forest_pctg",
+                            treatment.var = "treatment",
+                            time.var = "year", constant = TRUE)
 
 # Prediction of Synthetic Control
-result_aud <- scest(df_aud, w.constr = list("name" = "simplex"))
+result_aud <- scpi::scest(df_aud, w.constr = list("name" = "simplex"))
 
 # Plotting
 plots <- scplotMulti(result_aud, e.out = TRUE, ncols = 6)
@@ -227,7 +227,8 @@ data <- bind_rows(redd_treated_registered, redd_control)
 
 # Create new column based on the sum of Forest and Non Forest Natural Formation
 data <- data %>% 
-  mutate(Total_natural_formation = Forest_pctg + Other_natural_formation_pctg)
+  mutate(Total_natural_formation = Forest_pctg + Other_natural_formation_pctg,
+         .after = treatment)
 
 # Filter APD projects
 data_apd <- data %>% 
