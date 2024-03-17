@@ -77,6 +77,30 @@ conservation_units <- conservation_units %>%
   sf::st_make_valid() %>% 
   sf::st_collection_extract(type = "POLYGON")
 
+# Check CRS of data
+crs_redd <- crs(projects_redd)
+
+# Define CRS with meters as coordinate system
+crs_meters <- "+proj=utm +zone=23 +south +datum=WGS84 +units=m +no_defs"
+
+# Convert data for projection system that uses meters as unit and simplify geometry
+projects_redd_meters <- st_transform(projects_redd,
+                                     crs = crs_meters) %>% 
+  st_simplify(dTolerance = 5)
+
+# Create buffer around each projects in projects_redd
+buffer_redd <- sf::st_buffer(projects_redd_meters, dist = 10000)
+
+# Convert buffer back to the redd projects CRS
+buffer_redd <- st_transform(buffer_redd,
+                            crs = crs_redd) %>%
+  sf::st_make_valid()
+
+
+# Removing original buffer area
+buffer_no_redd <- st_difference(buffer_redd, projects_redd)
+
+
 # Compiling function so it runs faster
 compiled_coverage_fun <- compiler::cmpfun(get_coverage_properties)
 
@@ -86,6 +110,9 @@ land_coverage_redd          <- compiled_coverage_fun(list_of_rast_files = raster
 
 land_coverage_redd_extract  <- compiled_coverage_fun(list_of_rast_files = raster_files,
                                                      sf_dataframe = projects_redd_extracted)
+
+land_coverage_buffer        <- compiled_coverage_fun(list_of_rast_files = raster_files,
+                                                     sf_dataframe = buffer_no_redd)
 
 land_coverage_car           <- compiled_coverage_fun(list_of_rast_files = raster_files,
                                                      sf_dataframe = land_tenure_property)
