@@ -37,7 +37,7 @@ coverage_redd          <- readr::read_csv(here::here("results",
                                             "land_coverage",
                                             "redd_projects.csv"))
 
-coverage_redd_div      <- readr::read_csv(here::here("results",
+coverage_redd_divided  <- readr::read_csv(here::here("results",
                                                 "land_coverage",
                                                 "redd_projects_divided.csv"))
 

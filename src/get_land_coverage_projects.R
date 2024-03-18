@@ -78,7 +78,7 @@ conservation_units <- conservation_units %>%
   sf::st_collection_extract(type = "POLYGON")
 
 # Check CRS of data
-crs_redd <- crs(projects_redd)
+crs_redd <- st_crs(projects_redd)
 
 # Define CRS with meters as coordinate system
 crs_meters <- "+proj=utm +zone=23 +south +datum=WGS84 +units=m +no_defs"
@@ -86,7 +86,7 @@ crs_meters <- "+proj=utm +zone=23 +south +datum=WGS84 +units=m +no_defs"
 # Convert data for projection system that uses meters as unit and simplify geometry
 projects_redd_meters <- st_transform(projects_redd,
                                      crs = crs_meters) %>% 
-  st_simplify(dTolerance = 5)
+  sf::st_make_valid()
 
 # Create buffer around each projects in projects_redd
 buffer_redd <- sf::st_buffer(projects_redd_meters, dist = 10000)
@@ -94,12 +94,12 @@ buffer_redd <- sf::st_buffer(projects_redd_meters, dist = 10000)
 # Convert buffer back to the redd projects CRS
 buffer_redd <- st_transform(buffer_redd,
                             crs = crs_redd) %>%
-  sf::st_make_valid()
-
+  dplyr::select(id)
 
 # Removing original buffer area
-buffer_no_redd <- st_difference(buffer_redd, projects_redd)
-
+buffer_no_redd <- st_difference(buffer_redd_valid, projects_redd) %>% 
+  dplyr::filter(id == id.1) %>% 
+  dplyr::select(!id.1)
 
 # Compiling function so it runs faster
 compiled_coverage_fun <- compiler::cmpfun(get_coverage_properties)
@@ -128,12 +128,6 @@ land_coverage_conservation  <- compiled_coverage_fun(list_of_rast_files = raster
 # III: Save processed data
 # ============================================================================================
 # Save files
-readr::write_csv(
-  x            = land_coverage_car,
-  file         = paste0(here::here("results", "land_coverage"), "/full_property.csv"),
-  na           = "NA",
-  col_names    = TRUE,
-  quote        = "needed")
 
 readr::write_csv(
   x            = land_coverage_redd_extract,
@@ -145,6 +139,20 @@ readr::write_csv(
 readr::write_csv(
   x            = land_coverage_redd,
   file         = paste0(here::here("results", "land_coverage"), "/redd_projects.csv"),
+  na           = "NA",
+  col_names    = TRUE,
+  quote        = "needed")
+
+readr::write_csv(
+  x            = land_coverage_buffer,
+  file         = paste0(here::here("results", "land_coverage"), "/buffer_projects.csv"),
+  na           = "NA",
+  col_names    = TRUE,
+  quote        = "needed")
+
+readr::write_csv(
+  x            = land_coverage_car,
+  file         = paste0(here::here("results", "land_coverage"), "/full_property.csv"),
   na           = "NA",
   col_names    = TRUE,
   quote        = "needed")
