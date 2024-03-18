@@ -50,7 +50,7 @@ rsconnect/
 
 # Large files from Data
 /data/Amazon_info
-data/Atlas_agriculture
+/data/Atlas_agriculture
 /data/CAR
 /data/Land_coverage
 /results/tenure_projects_data
