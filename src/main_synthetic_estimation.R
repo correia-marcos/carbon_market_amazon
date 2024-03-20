@@ -10,21 +10,12 @@
 # 
 # @summary: This program intends to
 #   0 - Create short data processing (merging datasets and create new one) 
-#   1 - Create function to apply synthetic control
+#   1 - Create function to apply synthetic controls
 #   2 - Create figure of results
 # 
 # @Date: out 2023
 # @author: Marcos
 
-# Clear environment
-rm(list = ls())
-
-# Required for increasing reproducibility
-library(groundhog)            # You need to have at least R version = 4.3.1
-
-# Required packages 
-pkgs <- c("ggplot2", "haven", "foreign", "dplyr", "sf", "sp",
-          "raster", "viridis", "ggplot2", "scpi", "lubridate")
 
 # Load packages
 groundhog.library(pkgs, "2023-09-01")

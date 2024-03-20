@@ -23,6 +23,45 @@ here::i_am(".gitignore")
 # ############################################################################################
 # Functions
 # ############################################################################################
+# Function --------------------------------------------------------------------
+# @Arg       : start_year is number representing first year to download
+# @Arg       : end_year is number representing last year to download
+# @Output    : no output
+# @Purpose   : Function downloads all required raster files
+# @Written_on: 10/01/2024
+# @Written_by: Marcos Paulo
+download_mapbiomas <- function(start_year = 2000, end_year = 2022) {
+  base_url <- "https://storage.googleapis.com/mapbiomas-public"
+  initiative <- "/initiatives/brasil"
+  collection <- "/collection_8/lclu/coverage"
+  
+  for(year in start_year:end_year) {
+    file_name <- paste0("/brasil_coverage_", year, ".tif")
+    full_url <- paste0(base_url, initiative, collection, file_name)
+    
+    # Directory for download
+    save_path <- paste0(here::here("data", "Land_coverage"), "/brasil_coverage_", year, ".tif")
+    
+    # Make the download
+    download.file(full_url, save_path, mode="wb")
+    
+    cat("Downloaded: ", save_path, "\n")
+  }
+}
+  
+  for (year in start_year:end_year) {
+    # Construindo o URL para o ano específico
+    url <- gsub("{year}", year, base_url)
+    
+    # Definindo o caminho do arquivo de destino
+    file_path <- sprintf("data/Land_coverage/brasil_coverage_%s.tif", year)
+    
+    # Baixando o arquivo
+    download.file(url, file_path, mode="wb")
+    
+    message("Download completo para o ano de ", year, ": ", file_path)
+  }
+}
 
 # Function --------------------------------------------------------------------
 # @Arg       : file_path is vector with the full name of the excel files
@@ -339,4 +378,172 @@ get_coverage_properties <- function(list_of_rast_files, sf_dataframe) {
   
   # Return the final dataframe
   return(coverage_car)
+}
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 12/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : legend_df is a dataframe with information about the meaning of raster values
+# @Arg       : column_id is the name of a column where value of the raster can be found
+# @Arg       : column_description is the name of a column with the description of values
+# @Arg       : land_coverage_df is a dataframe composed of columns with the id as column name
+# @Output    : Arranged Dataframe from land_coverage_df with numerical column names changed
+# @purpose   : Change the column names to make it easier to process
+# @desc      : Map the association between column_id and column_description and changed column
+# names according to its value. It also arrange the dataframe in panel (tidy) format and change
+# order of two columns in the Land_coverage_df
+convert_columns_panel <- function(legend_df, column_id, column_description, land_coverage_df){
+  
+  # Make sure the required column have the correct class
+  legend_df <- legend_df %>% 
+    mutate_at(vars(column_id, column_description), as.character)
+
+  # Get a vector corresponding to the column args
+  id_vector <- c(legend_df[[column_id]])
+  description_vector <- c(legend_df[[column_description]])
+  
+  # Change column names in 'land_coverage_df' according to a map between both columns
+  setnames(land_coverage_df, id_vector, description_vector, skip_absent=TRUE)
+  
+  # Arrange and reorder columns
+  if (all(c("id", "year") %in% names(land_coverage_df))) {
+    land_coverage_df <- land_coverage_df %>% 
+      dplyr::arrange(id, year) %>% 
+      dplyr::select(any_of(c("id", "year")), everything())
+  }
+  
+  if (all(c("id_registry", "year") %in% names(land_coverage_df))) {
+    land_coverage_df <- land_coverage_df %>%
+      dplyr::arrange(id_registry, year) %>%
+      dplyr::select(any_of(c("id_registry", "year")), everything())
+  }
+  
+  # Return the dataframe with changed column names and arranged in panel format
+  return(land_coverage_df)
+}
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 12/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : land_coverage_df is a dataframe composed with land use coverage data
+# @Arg       : property_project_df is a dataframe with info about REDD+ projects and properties
+# @Output    : Arranged Dataframe from land_coverage_df with summarized values by id_registry
+# @purpose   : Aggregated values from the same project when there exits many values
+# @desc      : The function first created a column "id_registry" if it doesn't exist. Then it
+# summarized values by year and id_registry so that we can reduce dataframe size
+agg_coverage_values <- function(land_coverage_df, property_project_df){
+  
+  # Create id_registry column if the dataframe don't already contain it
+  if ("id" %in% names(land_coverage_df)) {
+  land_coverage_df <- land_coverage_df %>%
+    mutate(id_registry = as.character(
+      property_project_df$id_registry[match(land_coverage_df$id,
+                                                                property_project_df$id)]))
+  }
+  
+  # Convert all NA values to 0
+  land_coverage_df <- land_coverage_df %>%
+    mutate(across(where(is.numeric), ~if_else(is.na(.x), 0, .x)))
+  
+  # Group the values by "year" / "id_registry" and sum the values in numerical columns
+  # Check if column "id" exists
+  if("id" %in% names(land_coverage_df) && is.character(land_coverage_df$id)) {
+    # Column "id" exists and is type character - remove it and proceeds
+    summarized_df <- land_coverage_df %>%
+      dplyr::select(!id) %>% 
+      group_by(id_registry, year) %>%
+      summarise(across(where(is.numeric), ~sum(.x, na.rm = TRUE)), .groups = 'drop') %>% 
+      dplyr::arrange(id_registry, year) %>%
+      dplyr::select(any_of(c("id_registry", "year")), everything())
+  } else {
+    # Column id doesn't exist or is not character type
+    summarized_df <- land_coverage_df %>%
+      group_by(id_registry, year) %>%
+      summarise(across(where(is.numeric), ~sum(.x, na.rm = TRUE)), .groups = 'drop') %>%
+      dplyr::arrange(id_registry, year) %>%
+      dplyr::select(any_of(c("id_registry", "year")), everything())  
+  }
+  
+  # Return aggregated dataframe
+  return (summarized_df)
+}
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 12/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : land_coverage_df is a dataframe composed with land use coverage data
+# @Arg       : legend_df is a dataframe with information about the meaning of raster values
+# @Arg       : projects_df is a sf dataframe containing information about REDD+ projects
+# @Output    : Dataframe with reduced number of columns - aggregated values
+# @purpose   : Aggregate values of land use that represent the same general Class of data
+# @desc      : The function first delimits in legend_df which values corresponds to each
+# general class in MAPBIOMAS data. It Then create new columns based on this legend definition.
+# The function also merge values with projects_df datasets
+# Please check https://brasil.mapbiomas.org/codigos-de-legenda/ - legend 8
+get_coverage_classes <- function(land_coverage_df, legend_df, projects_df){
+  
+  # Get the classes corresponding with Forest and select only the needed classes
+  Forest <- as.character(c(legend_df[1:6, "Description"])[[1]])
+  Forest <- Forest[Forest %in% names(land_coverage_df)]
+  # Get the classes corresponding with Non Forest Natural Formation and select only the needed
+  Non_Forest_Natural <- as.character(c(legend_df[7:13, "Description"])[[1]])
+  Non_Forest_Natural <- Non_Forest_Natural[Non_Forest_Natural %in% names(land_coverage_df)]
+  # Get the classes corresponding with Farming and select only the needed classes
+  Farming <- as.character(c(legend_df[15:29, "Description"])[[1]])
+  Farming <- Farming[Farming %in% names(land_coverage_df)]
+  # Get the classes corresponding with Non vegetated area and select only the needed classes
+  Non_vegetated_area <- as.character(c(legend_df[30:34, "Description"])[[1]])
+  Non_vegetated_area <- Non_vegetated_area[Non_vegetated_area %in% names(land_coverage_df)]
+  # Get the classes corresponding with Water and select only the needed classes
+  Water <- as.character(c(legend_df[35:37, "Description"])[[1]])
+  Water <- Water[Water %in% names(land_coverage_df)]
+  
+  # Create new dataframe based by aggregating different columns
+  covered_agg <- land_coverage_df %>% 
+    mutate(Forest             = rowSums(land_coverage_df[Forest], na.rm = TRUE),
+           Non_Forest_Natural = rowSums(land_coverage_df[Non_Forest_Natural], na.rm = TRUE),
+           Farming            = rowSums(land_coverage_df[Farming], na.rm = TRUE),
+           Non_vegetated_area = rowSums(land_coverage_df[Non_vegetated_area], na.rm = TRUE),
+           Water              = rowSums(land_coverage_df[Water], na.rm = TRUE))
+  
+  if ("id_registry" %in% names(land_coverage_df)){
+    covered_agg <- covered_agg %>%
+      # Select only the new columns plus identifiable columns
+      dplyr::select(id_registry, year, Forest, Non_Forest_Natural, Farming, Non_vegetated_area,
+        Water, Not_Observed)
+  }else {
+    covered_agg <- covered_agg %>%
+      # Select only the new columns plus identifiable columns
+      dplyr::select(id, year, Forest, Non_Forest_Natural, Farming, Non_vegetated_area, Water,
+                    Not_Observed)
+  }
+  # Return new created dataframe
+  return(covered_agg)
+}
+
+# Function --------------------------------------------------------------------
+# @written_on: 12/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : land_coverage_df is a dataframe composed with land use coverage data
+# @Output    : Dataframe with percentage value instead of raw value
+# @purpose   : Calculate percentage of each class type in level Mapbiomas land use class
+# @desc      : The function simply transform raw value to percentages
+calculate_land_percentages <- function(land_coverage_df){
+  land_coverage_df <- land_coverage_df %>%
+    # Step 1: Calculate the total sum of the columns of interest for each row
+    mutate(Total = rowSums(dplyr::select(., Forest, Non_Forest_Natural, Farming,
+                                         Non_vegetated_area, Water, Not_Observed),
+                           na.rm = TRUE)) %>%
+    # Step 2: Calculate the percentages for each column
+    mutate(across(c(Forest, Non_Forest_Natural, Farming, Non_vegetated_area,
+                    Water, Not_Observed), 
+                  ~ .x / Total * 100, .names = "{.col}_")) %>%
+    # Remove unnecessary column
+    dplyr::select(-Total, -Forest, -Non_Forest_Natural, -Farming, -Non_vegetated_area,
+                  -Water, -Not_Observed)
+  
+  return(land_coverage_df)
 }
