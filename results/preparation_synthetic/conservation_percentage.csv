@@ -1,4 +1,4 @@
-id,year,Forest_,Non_Forest_Natural_,Farming_,Non_vegetated_area_,Water_,Not_Observed_
+id,year,Forest_pctg,Non_Forest_Natural_pctg,Farming_pctg,Non_vegetated_area_pctg,Water_pctg,Not_Observed_pctg
 0061c3f7-61d2-48d2-b5be-a1782570defe,2000,96.55911161959577,0,3.440888380404223,0,0,0
 0061c3f7-61d2-48d2-b5be-a1782570defe,2001,96.55911161959577,0,3.440888380404223,0,0,0
 0061c3f7-61d2-48d2-b5be-a1782570defe,2002,96.05329244242277,0,3.946707557577229,0,0,0

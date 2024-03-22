@@ -102,17 +102,13 @@ coverage_redd_divided <- convert_columns_panel(
 # Apply function from 'src/config_utils.R' to summarize values
 coverage_intersections <- agg_coverage_values(land_coverage_df    = coverage_intersections,
                                               property_project_df = property_project)
-
+coverage_redd         <- agg_coverage_values(land_coverage_df     = coverage_redd,
+                                             property_project_df  = property_project)
 coverage_redd_divided <- agg_coverage_values(land_coverage_df     = coverage_redd_divided,
                                              property_project_df  = property_project)
-
 coverage_property     <- agg_coverage_values(land_coverage_df     = coverage_property,
                                              property_project_df  = property_project)
-
 coverage_buffer       <- agg_coverage_values(land_coverage_df     = coverage_buffer,
-                                             property_project_df  = property_project)
-
-coverage_redd         <- agg_coverage_values(land_coverage_df     = coverage_redd,
                                              property_project_df  = property_project)
 
 # Apply function from 'src/config_utils.R' to get general classes of land use

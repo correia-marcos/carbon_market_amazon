@@ -1,4 +1,4 @@
-id_registry,year,Forest_,Non_Forest_Natural_,Farming_,Non_vegetated_area_,Water_,Not_Observed_
+id_registry,year,Forest_pctg,Non_Forest_Natural_pctg,Farming_pctg,Non_vegetated_area_pctg,Water_pctg,Not_Observed_pctg
 1094,2000,99.87585991644879,0.0011988306620177365,0,0,0.12294125288919448,0
 1094,2001,99.8798899481142,0.0011988306620177365,0,0,0.11891122122378725,0
 1094,2002,99.87540982410061,0.0011038996042193668,0,0,0.12348627629517166,0

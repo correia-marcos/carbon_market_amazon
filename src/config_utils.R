@@ -14,9 +14,9 @@ groundhog.library(
   pkg  = c(
     "assertthat", "broom", "cartography", "compiler", "data.table", "dplyr", "exactextractr",
     "foreign", "furrr", "ggplot2", "haven", "lubridate", "lwgeom", "stringr",
-    "raster", "RColorBrewer", "readr", "readxl", "scpi", "sf", "sp",
-    "terra", "viridis"),
-  date = "2023-09-01"
+    "raster", "RColorBrewer", "readr", "readxl", "scpi", "sf", "sp", "terra", "tidyr",
+    "viridis"),
+  date = "2024-01-01"
   )
 
 here::i_am(".gitignore")
@@ -48,20 +48,7 @@ download_mapbiomas <- function(start_year = 2000, end_year = 2022) {
     cat("Downloaded: ", save_path, "\n")
   }
 }
-  
-  for (year in start_year:end_year) {
-    # Construindo o URL para o ano específico
-    url <- gsub("{year}", year, base_url)
-    
-    # Definindo o caminho do arquivo de destino
-    file_path <- sprintf("data/Land_coverage/brasil_coverage_%s.tif", year)
-    
-    # Baixando o arquivo
-    download.file(url, file_path, mode="wb")
-    
-    message("Download completo para o ano de ", year, ": ", file_path)
-  }
-}
+
 
 # Function --------------------------------------------------------------------
 # @Arg       : file_path is vector with the full name of the excel files
@@ -540,10 +527,281 @@ calculate_land_percentages <- function(land_coverage_df){
     # Step 2: Calculate the percentages for each column
     mutate(across(c(Forest, Non_Forest_Natural, Farming, Non_vegetated_area,
                     Water, Not_Observed), 
-                  ~ .x / Total * 100, .names = "{.col}_")) %>%
+                  ~ .x / Total * 100, .names = "{.col}_pctg")) %>%
     # Remove unnecessary column
     dplyr::select(-Total, -Forest, -Non_Forest_Natural, -Farming, -Non_vegetated_area,
                   -Water, -Not_Observed)
   
   return(land_coverage_df)
+}
+
+# Function --------------------------------------------------------------------
+# @written_on: 12/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : land_coverage_df is a dataframe composed with land use coverage data
+# @Arg       : projects_df is a dataframe containing information about REDD+ projects
+# @Arg       : column_by is a string containing the name of a column to use as the by column
+# @Output    : Dataframe with merged information
+# @purpose   : Merge dataframes
+# @desc      : The function simply merge two datasets
+merge_data_synthetic <- function(land_coverage_df, information_df, column_by){
+  
+  # Convert id_registry into the correct type - for merging
+  if ("id_registry" %in% names(information_df)){
+    information_df <- information_df %>% 
+      mutate(id_registry = as.double(id_registry))
+  }
+  
+  # Merge datasets and create new columns
+  land_coverage_df <- land_coverage_df %>% 
+    left_join(information_df, by = column_by) %>%
+    mutate(Total_natural_formation = Forest_pctg + Non_Forest_Natural_pctg,
+           .after = year) %>% 
+    dplyr::select(-geom)
+  
+  return(land_coverage_df)
+}
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 12/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : land_coverage_df is a dataframe composed with land use coverage data
+# @Arg       : final_year is a number of the last year to take into account
+# @Arg       : criterion is a number corresponding to the percentage of tolerance 
+# @Output    : Dataframe with filtered information
+# @purpose   : Function to filter Conservation Units without significant deforestation
+# @desc      : The function simply create a variation column and filter values in it
+
+filter_no_deforestation <- function(land_coverage_df, final_year, criterion) {
+  # Ensuring 'year' and 'final_year' are numeric
+  land_coverage_df$year <- as.numeric(land_coverage_df$year)
+  final_year <- as.numeric(final_year)
+  
+  land_coverage_agg <- land_coverage_df %>% 
+    # Grouping by ID
+    group_by(id) %>%
+    # Filtering records between the initial year (2000) and 'final_year'
+    filter(year == 2000 | year == final_year) %>%
+    # Calculating the percentage variation of 'Total_natural_formation' - first and last year
+    summarise(variation_pct = (last(Total_natural_formation) - first(Total_natural_formation)) / 
+                first(Total_natural_formation)) %>%
+    # Filtering CU that did have a reduction greater than 1% in 'Total_natural_format'
+    filter(variation_pct <= criterion) %>% # CHANGE BACK TO <= 
+    
+    # Return filtered data
+    return (land_coverage_agg)
+}
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 8/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : df is a dataframe composed with land use coverage data and info about REDD+
+# @Arg       : criterion is a number corresponding to the percentage of tolerance 
+# @Output    : Dataframe with added columns
+# @purpose   : Function to create treatment columns based on certain conditions
+# @desc      : The function creates one column for each treated unit with value NA for all
+# other treated units and 0 for never treated. The treatment binary columns is based on the
+# 'start' column from df and equals 1 for treated units when year >= start (if start is in
+# last quarter, it takes the next year as the first treatment year). The function creates
+# different columns for each treated unit (with respective id) and three general treatment
+# columns
+create_treatment_columns <- function(df, years_antecipation) {
+  
+  # Initial preparation: Determine treated units and the year of treatment start
+  treated_info <- df %>%
+    filter(!is.na(certification_date)) %>%
+    mutate(start_year = year(start),
+           treatment_start_year = if_else(month(start) >= 10,
+                                          start_year + 1,
+                                          start_year),
+           certification_year   = if_else(month(certification_date) >= 10,
+                                          year(certification_date) + 1,
+                                          year(certification_date)),
+           anticipation_year    = treatment_start_year - years_antecipation) %>%
+    distinct(id_registry, treatment_start_year, certification_year, anticipation_year)
+  
+  df <- df %>% 
+    left_join(treated_info, by = "id_registry")
+  
+  # Adding direct treatment columns based on treatment criteria
+  df <- df %>%
+    mutate(
+      treatment = ifelse(!is.na(certification_date) & year >= treatment_start_year,
+                         1, 0),
+      treatment_registered = ifelse(!is.na(certification_date) & year >=  certification_date,
+                                    1, 0),
+      treatment_anticipation = ifelse(!is.na(certification_date) &
+          year >= anticipation_year, 1, 0)
+    )
+  
+  treatment_columns <- c("treatment", "treatment_registered", "treatment_anticipation")
+  
+  # Create treatment columns for each treated unit
+  for (i in seq_along(treated_info$id_registry)) {
+    current_id <- treated_info$id_registry[i]
+    start_year <- treated_info$treatment_start_year[i]
+    
+    new_col_name <- paste0("treatment_", current_id)
+    
+    # Creating the treatment column with specific criteria
+    df[[paste0("treatment_", current_id)]] <-
+      ifelse(
+        df$id_registry == current_id & df$year >= start_year,
+        1,
+        ifelse(df$id_registry == current_id, 0, NA)
+      )
+    
+    treatment_columns <- c(treatment_columns, new_col_name)
+  }
+  
+  # Update values for units that were never treated or are different from the current analysis
+  never_treated_ids <- setdiff(df$id_registry, treated_info$id_registry)
+  df <- df %>%
+    mutate(across(starts_with("treatment_"), ~ifelse(is.na(.),
+                                                     ifelse(id_registry %in% never_treated_ids,
+                                                            0, 
+                                                            NA),
+                                                     .)))
+  # Find the position of the "year" column
+  year_col_position <- which(names(df) == "year")
+  
+  # Rearrange columns to position treatment columns right after "year"
+  df <- df %>%
+    dplyr::select(names(df)[1:year_col_position], all_of(treatment_columns), everything()) 
+    # dplyr::select(!c(registry, project_developer, project_description, methodology_version))
+  
+  # Return df
+  return(df)
+}
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 8/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : projects_id is a id of APD treated REDD+
+# @Arg       : merged_project is a dataframe composed with land use coverage data and REDD+ info
+# @Arg       : deforestation_criterion is a value used for filter_no_deforestation
+# @Arg       : year is a number used for filter_no_deforestation
+# @Output    : Dataframe project with APD information and potential donors
+# @purpose   : Function to merge potential donors, projects - based on certain conditions
+# @desc      : The function creates finds 
+get_treatment_apd_cu <- function(projects_id, merged_project, deforestation_criterion, year){
+  
+  columns = c("id_registry", "year", "Total_natural_formation", "Forest_pctg",
+              "Non_Forest_Natural_pctg", "Farming_pctg", "Water_pctg", "Not_Observed_pctg",
+              "start", "certification_date", "state", "project_name", "area_ha")
+  
+  # Get dataframes for each treated APD projects
+  project_panel <- merged_project %>%
+    filter(id_registry == projects_id) %>% 
+    rename(area_ha = area_hectares) %>% 
+    mutate(id_registry = as.character(id_registry)) %>%  # important for merge
+    dplyr::select(all_of(columns))
+  
+  # Get states from project_panel
+  states <- project_panel %>%
+    dplyr::select(state) %>%
+    rowwise() %>%
+    mutate(state = list(unlist(strsplit(state, split = "/")))) %>%
+    unnest(state) %>% 
+    distinct() %>% 
+    pull()
+  
+  # Control for treated APDs
+  donors <- filter_no_deforestation(land_coverage_df = merged_conservation,
+                                    final_year = year,
+                                    criterion = deforestation_criterion) %>%
+    right_join(merged_conservation, by = join_by(id)) %>% # get information from CU
+    rename(id_registry = id, project_name = name, state = sigla_uf) %>%  # rename columns merge
+    dplyr::select(!variation_pct) %>%  # remove unnecessary columns
+    mutate(start = NA, certification_date = NA, area_ha = as.double(area_ha)) %>% 
+    filter(state %in% states)
+  
+  # Merge donors with treated project
+  merged_df <- full_join(project_panel, donors, by = columns)
+  
+  # Return final df
+  return(merged_df)
+}
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 8/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : df is a dataframe of REDD+ projects with their land information
+# @Arg       : type is a string (either "APD" or "AUD")
+# @Arg       : tolerance is a value specifying the tolerance level about the variation in data
+# @Arg       : additional is a logical argument to take projects that are both APD and AUD
+# @Output    : Dataframe with filtered type and filtered about little variation projects
+# @purpose   : Function to filter type and variation level
+# @desc      : The function filter data based on type and amount of variation in the outcome
+# component
+filter_type_variation <- function(df, type, tolerance, additional = FALSE){
+  
+  # Filter data by redd type
+  if(additional){
+    data <- df %>%
+      filter(redd_type == type | redd_type == "AUD/APD")
+  } else{
+    data <- df %>%
+      filter(redd_type == type)
+  }
+    
+  
+  # Identify donors with no/low variation - reduction donor pool may be important
+  donors_no_var <- data %>%
+    group_by(id_registry) %>%
+    filter(diff(range(Total_natural_formation)) <= tolerance) %>% # 0.0005 all time
+    distinct(id_registry) %>%
+    ungroup() %>% 
+    pull(id_registry)
+  
+  data <- data[!data$id_registry %in% donors_no_var, ]
+  
+  return(data)
+}
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 8/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : df is a dataframe of REDD+ projects with their land information
+# @Output    : Dataframe with filtered type and filtered about little variation projects
+# @purpose   : Function to filter type and variation level
+# @desc      : The function filter data based on type and amount of variation in the outcome
+# component
+create_treatment_dfs <- function(df) {
+  # Identify treatment columns
+  treatment_cols <- grep("^treatment_", names(df), value = TRUE)
+  
+  # Extract registry IDs from treatment columns and filter to keep only numeric ones
+  treatment_ids <- gsub("treatment_", "", treatment_cols)
+  treatment_ids <- treatment_ids[grepl("^\\d+$", treatment_ids)]
+  
+  for (id in treatment_ids) {
+    # Dynamic name for each dataframe
+    df_name <- paste0("verra_", id)
+    
+    # Get the redd_type of the treated unit
+    treated_redd_type <- df %>% 
+      filter(id_registry == id) %>% 
+      dplyr::select(redd_type) %>% 
+      unique() %>%
+      pull(redd_type)
+    
+    # Filter for the treated unit and controls with the same redd_type (never treated)
+    filtered_df <- df %>%
+      filter(redd_type == treated_redd_type) %>%
+      filter((get(paste0("treatment_", id)) == 1) | 
+               get(paste0("treatment_", id)) == 0 & id_registry == id |
+               rowSums(is.na(dplyr::select(., starts_with("treatment_"))) |
+                         dplyr::select(., starts_with("treatment_")) == 0,
+                       na.rm = TRUE) == length(treatment_cols)) %>%
+      dplyr::select(-one_of(treatment_cols)) # Optionally remove treatment columns
+    
+    # Assign the filtered dataframe to a dynamically named variable in the global environment
+    assign(df_name, filtered_df, envir = .GlobalEnv)
+  }
 }
