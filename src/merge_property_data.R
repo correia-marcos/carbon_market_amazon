@@ -23,7 +23,7 @@ source(here::here("src", "config_utils.R"))
 # I: Import data
 # ============================================================================================
 # Create a list of the states to get CAR information
-states <- list.files(here::here("Data", "Atlas_agriculture"))
+states <- list.files(here::here("data", "Atlas_agriculture"))
 
 # Import projects and the csv data
 projects <- sf::st_read(here::here("results",

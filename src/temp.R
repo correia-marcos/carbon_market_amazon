@@ -1,14 +1,132 @@
-# =============================================================================
-# =============================================================================
-# Synthetic control estimation for AUD (avoided unplanned deforestation) REDD+
-# Treatment: REDD+ AUD projects year of operation 
-# Donors: REDD+ AUD projects not yet registered
-# =============================================================================
-# =============================================================================
-# Defining the Final dataset: data
 
+final_redd <- 
+  readr::read_csv(here::here("results", "final_dataset_synthetic", "final_redd_valid.csv")) %>% 
+  rename(area_ha = area_hectares)
 
+final_properties <- 
+  readr::read_csv(here::here("results", "final_dataset_synthetic", "final_properties.csv")) %>% 
+  rename(area_ha = area_hectares)
+
+final_intersections <- 
+  readr::read_csv(here::here("results", "final_dataset_synthetic",
+                             "final_intersections.csv")) %>%
+  rename(area_ha = area_hectares)
+
+verra_832_conservation <- 
+  readr::read_csv(here::here("results", "final_dataset_synthetic", "apd_832_conservation.csv"))
+
+verra_1147_conservation <- 
+  readr::read_csv(here::here("results", "final_dataset_synthetic", "apd_1147_conservation.csv"))
+
+verra_1382_conservation <- 
+  readr::read_csv(here::here("results", "final_dataset_synthetic", "apd_1382_conservation.csv"))
+
+verra_2551_conservation <- 
+  readr::read_csv(here::here("results", "final_dataset_synthetic", "apd_2551_conservation.csv"))
+
+conservation_units <- 
+  sf::st_read(here::here("data", "Conservation_units")) %>%
+  st_set_geometry(NULL)
+
+projects <- 
+  sf::st_read(here::here("results", "base_afolu_complete", "base_afolu_complete.gpkg")) %>%
+  filter(afolu == "REDD")
+
+legend_df <- 
+  readr::read_csv2(here::here("data", "Legend", "Codigos-da-legenda-colecao-8.csv"))
 # Create new column based on the sum of Forest and Non Forest Natural Formation
+
+# =============================================================================================
+# =============================================================================================
+# Get verra projects
+# =============================================================================================
+# =============================================================================================
+unique(projects$project_status)
+unique(projects$redd_type)
+
+tratados_aud <- projects %>% 
+  filter(project_status == "Registered" | project_status == "On Hold") %>%
+  filter(redd_type == "AUD")
+  
+tratados_apd <- projects %>% 
+  filter(project_status == "Registered" | project_status == "On Hold") %>%
+  filter(redd_type == "APD")
+
+# =============================================================================================
+# =============================================================================================
+# PLACEBO ESTIMATION
+# =============================================================================================
+# =============================================================================================
+# Get a list of treated APD projects
+verra_apd_names <- c("verra_1147_conservation", "verra_1382_conservation",
+                     "verra_2551_conservation", "verra_832_conservation")
+
+# Apply function from 'src/config_utils.R' to get merge information about conservation units
+merge_filter_clean(conservation_df = conservation_units,
+                   verra_df_names = verra_apd_names)
+
+# Create treatment df with placebos
+placebo_df <- rbind(verra_1147_conservation, verra_1382_conservation,
+                    verra_2551_conservation, verra_832_conservation) %>% 
+  unique() %>%
+  mutate(
+    treatment = ifelse(year >= year(start), 1, 0), .after = year)
+
+average_area <- 25739
+
+# Passo 1: Separar linhas com os id_registry específicos
+specific_rows <- placebo_df %>%
+  filter(id_registry %in% c("1147", "1382", "832", "2551"))
+
+# Passo 2 e 3: Filtrar as 20 unidades não especificadas mais próximas de 25739 em area_ha
+other_units_df <- placebo_df %>%
+  # Primeiro, filtra excluindo os id_registry específicos
+  filter(!id_registry %in% c("1147", "1382", "832", "2551")) %>%
+  # Agrupa por id_registry
+  group_by(id_registry) %>%
+  # Filtra grupos onde todos os valores de treatment são iguais a 1 e
+  # onde existe variabilidade na coluna Total_natural_formation
+  filter(!all(treatment == 1) & n_distinct(Total_natural_formation) > 1) %>%
+  # Desagrupa para evitar agrupamento indesejado em operações futuras
+  ungroup()
+
+closest_ids <- other_units_df %>% 
+  mutate(difference = abs(area_ha - 25739)) %>% 
+  group_by(id_registry) %>%
+  summarise(min_difference = min(difference)) %>%
+  ungroup() %>%
+  arrange(min_difference) %>% 
+  head(20) %>%
+  pull(id_registry)
+
+# Filtra as linhas que correspondem aos 20 id_registry selecionados
+closest_rows_df <- other_units_df %>%
+  filter(id_registry %in% closest_ids)
+
+# Passo 4: Combinar os dois subconjuntos
+placebo_df_filtered <- bind_rows(specific_rows, closest_rows_df)
+
+
+# Make placebo synthetic control
+df <- scpi::scdataMulti(placebo_df_filtered, id.var = "id_registry",
+                        outcome.var = "Total_natural_formation",
+                        treatment.var = "treatment",
+                        time.var = "year", constant = TRUE)
+
+
+
+
+
+# Instale e carregue o pdftools
+install.packages("pdftools")
+library(pdftools)
+
+# Gera uma lista dos caminhos dos arquivos PDF que você acabou de salvar
+pdf_files <- list.files("results/synthetic_controls", full.names = TRUE, pattern = "\\.pdf$")
+
+# Combine os PDFs em um único arquivo
+pdf_combine(pdf_files, output = "results/synthetic_controls/combined_plots.pdf")
+
 
 
 
@@ -202,30 +320,6 @@ scplotMulti(respi, type = "series", joint = TRUE)
 
 
 # ==============================================================================
-
-
-plot <- ggplot(toplot) + xlab("Date") + ylab("Outcome") +
-  geom_line(aes(x=Time, y=Y, colour=Type)) + 
-  geom_point(aes(x=Time, y=Y, colour=Type), size=1.5) + 
-  geom_vline(aes(xintercept=Tdate)) +
-  facet_wrap(~ID, ncol = 2) + theme(legend.position="bottom") +
-  scale_color_manual(name = "", values = c("black", "blue"),
-                     labels = c("Treated", "Synthetic Control"))
-
-plot.w1 <- plot + geom_errorbar(data = toplot,
-                                aes(x = Time, ymin = lb.gaussian, ymax = ub.gaussian), colour = "blue",
-                                width = 0.5, linetype = 1) + ggtitle("In and Out of Sample Uncertainty - Subgaussian Bounds")
-
-plotdf <- subset(toplot, Type == "Synthetic")
-plot.w1 + geom_ribbon(data=plotdf, aes(x=Time, ymin=lb.joint, ymax=ub.joint), fill="blue", alpha=0.1)
-
-
-
-
-
-
-
-
 
 # Create dataset for the synthetic control
 verra_1686 <- filter(final_dataset_panel, ID == "1686")
@@ -492,19 +586,6 @@ final_dataset_panel <- final_dataset_panel %>%
 # Save dataset
 write.csv(final_dataset_panel, file = "Data/final_forest.csv",
           row.names = FALSE)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # =============================================================================
 # Dissertation: Can carbon market save the Amazon: Evidence from Brazil
@@ -1082,3 +1163,17 @@ plot <- plot +
 plot + geom_errorbar(data = plotdf,
                      aes(x = t, ymin = lb, ymax = ub, colour = sname.y),
                      width = 0.5, linetype = 1)
+
+
+
+BC_combined <- cbind(synthetic_1094$data$B, synthetic_1094$data$C)
+block_A = synthetic_1094$data$A
+
+modelo <- lm(synthetic_1094$data$A ~ synthetic_1094$data$B)
+model <- lm(block_A %>% %>% %>% %>% ~ BC_combined)
+
+# Sumário do modelo para verificar a significância dos preditores
+summary(model)
+summary(modelo)
+# Calcular os VIFs para o modelo ajustado
+vifs <- car::vif(model)

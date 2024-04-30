@@ -13,13 +13,15 @@ library(groundhog)            # You need to have at least R version = 4.3.1
 groundhog.library(
   pkg  = c(
     "assertthat", "broom", "cartography", "compiler", "data.table", "dplyr", "exactextractr",
-    "foreign", "furrr", "ggplot2", "haven", "lubridate", "lwgeom", "stringr",
-    "raster", "RColorBrewer", "readr", "readxl", "scpi", "sf", "sp", "terra", "tidyr",
-    "viridis"),
-  date = "2024-01-01"
-  )
+    "foreign", "furrr", "ggplot2", "haven", "lubridate", "lwgeom", "patchwork", 
+    "purrr", "pdftools", "stringr", "raster", "RColorBrewer", "readr", "readxl",
+    "rnaturalearth", "rnaturalearthdata", "scpi", "scales", "sf", "sp", "terra",
+    "tidyr", "viridis"),
+  date = "2024-03-03")
 
 here::i_am(".gitignore")
+
+
 # ############################################################################################
 # Functions
 # ############################################################################################
@@ -47,6 +49,39 @@ download_mapbiomas <- function(start_year = 2000, end_year = 2022) {
     
     cat("Downloaded: ", save_path, "\n")
   }
+}
+
+
+
+# Function --------------------------------------------------------------------
+# @Arg       : "ets_df" is dataframe containing information about worldwide ETS 
+# @Arg       : vector_states is a vector containing the US states or countries in EU
+# @Arg       : ets_name is a string with the name "RGGI" or "EU-ETS" as it is written on ets_df
+# @Output    : Dataframe with new lines consisting of states of RGGI
+# @Purpose   : Replicate the ets_name row for each state/country in the vector_states
+# @Desc      : Replicate the ets_name row for each state/country in the vector_states, since
+# the ets_df was not in a tidy format. Sam
+# @Written_on: 11/04/2024
+# @Written_by: Marcos Paulo
+expand_ets <- function(ets_df, vector_states, ets_name = "RGGI") {
+  # Find the row with 'RGGI' in 'Jurisdiction covered'
+  rggi_row <- ets_df[ets_df$`Jurisdiction covered` == ets_name, ]
+  
+  # Stop execution and show error if no 'RGGI' entry is found
+  if(nrow(rggi_row) == 0) {
+    stop("No 'ets_name' entry found in the 'Jurisdiction covered' column.")
+  }
+  
+  # Replicate the 'RGGI' row for each state in the 'rggi' vector
+  rggi_rows <- do.call(rbind, replicate(length(vector_states), rggi_row, simplify = FALSE))
+  rownames(rggi_rows) <- NULL  # Clear row names
+  rggi_rows$`Jurisdiction covered` <- vector_states  # Replace 'RGGI' with each state's name
+  
+  # Remove the original 'RGGI' row and add the new rows
+  ets_df <- ets_df[ets_df$`Jurisdiction covered` != ets_name, ]
+  ets_df <- rbind(ets_df, rggi_rows)
+  
+  return(ets_df)
 }
 
 
@@ -426,8 +461,7 @@ agg_coverage_values <- function(land_coverage_df, property_project_df){
   if ("id" %in% names(land_coverage_df)) {
   land_coverage_df <- land_coverage_df %>%
     mutate(id_registry = as.character(
-      property_project_df$id_registry[match(land_coverage_df$id,
-                                                                property_project_df$id)]))
+      property_project_df$id_registry[match(land_coverage_df$id, property_project_df$id)]))
   }
   
   # Convert all NA values to 0
@@ -768,11 +802,11 @@ filter_type_variation <- function(df, type, tolerance, additional = FALSE){
 # @written_on: 8/02/2024
 # @written_by: Marcos Paulo
 # @Arg       : df is a dataframe of REDD+ projects with their land information
-# @Output    : Dataframe with filtered type and filtered about little variation projects
-# @purpose   : Function to filter type and variation level
-# @desc      : The function filter data based on type and amount of variation in the outcome
-# component
-create_treatment_dfs <- function(df) {
+# @Arg       : additional is a logical argument to take projects that are both APD and AUD
+# @Output    : Dataframes with one treated and all correct potential donors
+# @purpose   : Function to create single dataframes
+# @desc      : The function finds the treated units and sets appropriates donors
+create_treatment_dfs <- function(df, additional = FALSE) {
   # Identify treatment columns
   treatment_cols <- grep("^treatment_", names(df), value = TRUE)
   
@@ -792,16 +826,348 @@ create_treatment_dfs <- function(df) {
       pull(redd_type)
     
     # Filter for the treated unit and controls with the same redd_type (never treated)
-    filtered_df <- df %>%
-      filter(redd_type == treated_redd_type) %>%
-      filter((get(paste0("treatment_", id)) == 1) | 
-               get(paste0("treatment_", id)) == 0 & id_registry == id |
-               rowSums(is.na(dplyr::select(., starts_with("treatment_"))) |
-                         dplyr::select(., starts_with("treatment_")) == 0,
-                       na.rm = TRUE) == length(treatment_cols)) %>%
-      dplyr::select(-one_of(treatment_cols)) # Optionally remove treatment columns
+    # if Additional is True, we also take AUD/APD projects
+    if(additional){
+      filtered_df <- df %>%
+        filter(redd_type == treated_redd_type | redd_type == "AUD/APD") %>%
+        filter((get(paste0("treatment_", id)) == 1) | 
+                 get(paste0("treatment_", id)) == 0 & id_registry == id |
+                 rowSums(is.na(dplyr::select(., starts_with("treatment_"))) |
+                           dplyr::select(., starts_with("treatment_")) == 0,
+                         na.rm = TRUE) == length(treatment_cols)) %>%
+        dplyr::select(-one_of(treatment_cols)) # Optionally remove treatment columns
+    } else {
+      filtered_df <- df %>%
+        filter(redd_type == treated_redd_type) %>%
+        filter((get(paste0("treatment_", id)) == 1) | 
+                 get(paste0("treatment_", id)) == 0 & id_registry == id |
+                 rowSums(is.na(dplyr::select(., starts_with("treatment_"))) |
+                           dplyr::select(., starts_with("treatment_")) == 0,
+                         na.rm = TRUE) == length(treatment_cols)) %>%
+        dplyr::select(-one_of(treatment_cols)) # Optionally remove treatment columns
+    }
     
     # Assign the filtered dataframe to a dynamically named variable in the global environment
     assign(df_name, filtered_df, envir = .GlobalEnv)
   }
 }
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 8/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : conservation_df is a dataframe containing information about conservation units
+# @Arg       : verra_df_names is a list dataframes of treated units APD projects (each)
+# @Output    : Assigns for the dataframes in the list the merged data
+# @purpose   : Function to merge two datasets by clearing the "nome" column from the first argue
+# @desc      : The function first treat "nome" column, merge and add new information about the
+# year in which conservation units were created. The function also removes any "FLORESTA", 
+# "ESTAÇÃO" or "PARQUE" from dataset
+merge_filter_clean <- function(conservation_df, verra_df_names) {
+  
+  # First, clean and prepare conservation units
+  conservation_df_cleaned <- conservation_df %>%
+    mutate(start = as.character(ano_cria), # Guarantee start as character
+           start = gsub(".*?(\\d{4}).*", "\\1", start), # take year
+           start = ymd(paste0(start, "-01-01")), .after = esfera) %>% # Converts to Date
+    filter( # filter values
+      !grepl("FLORESTA", nome, ignore.case = TRUE) &
+      !grepl("ESTAÇÃO|ESTAçãO", nome, ignore.case = TRUE) &
+      !grepl("PARQUE", nome, ignore.case = TRUE)
+    )
+    
+    
+  for(df_name in verra_df_names) {
+    
+    # Dynamically loads the verra_* dataframe
+    verra_df <- get(df_name) %>%
+      filter( # filter values
+        !grepl("FLORESTA", project_name, ignore.case = TRUE) &
+        !grepl("ESTAÇÃO|ESTAçãO", project_name, ignore.case = TRUE) &
+        !grepl("PARQUE", project_name, ignore.case = TRUE))
+    
+    # Merge verra df with conservation_units
+    merged_df <- verra_df %>%
+      left_join(conservation_df_cleaned, by = c("project_name" = "nome"))
+    
+    #  Update the "start" column in the original verra_df only where it was NA before
+    verra_df$start <- coalesce(verra_df$start, merged_df$start.y)
+    
+    # Saves the updated dataframe back to the global environment with the same name
+    assign(df_name, verra_df, envir = .GlobalEnv)
+  }
+}
+
+# Function --------------------------------------------------------------------
+# @written_on: 8/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : treatment_df is a dataframe containing one treated and its potential donors
+# @Arg       : acceptable_variation is a number about the minimum amount of variation in data
+# @Arg       : outcome is a string representing the column consider as the outcome
+# @Arg       : cov_adj is a list of covariates to be adjusted
+# @Arg       : convervation_donors is a logical value about using conservation units
+# @Output    : Returns a list of class "scpi" that have the synthetic results
+# @purpose   : Function estimate single unit synthetic controls
+# @desc      : The function first get information about the treated unit, filter donors with
+# low amount of variation, and then estimate synthetic control using scpi package
+# See https://github.com/nppackages/scpi/blob/main/R/
+estimate_unit_synthetic <- function(treatment_df, acceptable_variation, outcome, cov_adj,
+                                    conservation_donors = FALSE){
+  # Get information about the treated project
+  treated_information <- treatment_df %>% 
+    filter(!is.na(certification_date)) %>% # enable to find the treated value in treatment_df
+    mutate(start_year = year(start),
+           treatment_start_year = if_else(month(start) >= 10,
+                                          start_year + 1,
+                                          start_year),
+           certification_year   = if_else(month(certification_date) >= 10,
+                                          year(certification_date) + 1,
+                                          year(certification_date))) %>%
+    distinct(id_registry, treatment_start_year, certification_year)
+  
+  # Get information about the treated unit
+  treated_year         <- treated_information$treatment_start_year
+  treated_id           <- treated_information$id_registry
+  treated_registration <- treated_information$certification_year
+  
+  # Filter donors
+  donors <- treatment_df %>%
+    filter(is.na(certification_date))
+  
+  # Filter treated
+  values_id <- treatment_df %>% 
+    filter(!is.na(certification_date))
+  
+  # Find good donors
+  donors_vars <- donors %>%
+    filter(year >= 2000 & year <= treated_year) %>%
+    group_by(id_registry) %>%
+    summarise(variation = diff(range(Total_natural_formation)),
+              value_zero = any(Total_natural_formation == 0)) %>%
+    filter(variation >= acceptable_variation & !value_zero) %>%
+    pull(id_registry)
+  
+  # Remove bad donors
+  donors <- donors[donors$id_registry %in% donors_vars, ]
+  
+  # Create main dataframe
+  data <- rbind(values_id, donors)
+  
+  # List of features
+  # list_features <- list(c(outcome,"area_ha"))
+  
+  ### Set options for data preparation
+  id.var            <- "id_registry"                              # ID variable
+  time.var          <- "year"                                     # Time variable
+  period.pre        <- seq(from = first(data$year), to = treated_year, by = 1)
+  period.post       <- seq(from = treated_year + 1, to = last(data$year))
+  unit.tr           <- treated_id                                 # Treated unit
+  unit.co           <- setdiff(unique(data$id_registry), unit.tr) # Donors pool
+  outcome.var       <- outcome                                    # Outcome variable
+  cov.adj           <- cov_adj                                    # Covariates for adjustment
+  features          <- outcome                                    # No features != outcome
+  constant          <- FALSE                                      # No constant term
+  report.missing    <- TRUE                                       # To check missing values 
+  cointegrated.data <- TRUE                                       # Belief data cointegrated
+  verbose           <- TRUE
+  anticipation      <- 0
+  
+  # Define new covariates for APD with conservation units donors
+  if(conservation_donors){
+    features <- c("Total_natural_formation", "area_ha")
+    cov.adj  <- list("Total_natural_formation" = c("constant", "trend"),
+                     "area_ha" = c("constant"))
+  }
+  
+  # Data preparation
+  df  <-
+    scdata(df                = data,
+           id.var            = id.var,
+           time.var          = time.var,
+           outcome.var       = outcome.var,
+           period.pre        = period.pre,
+           period.post       = period.post,
+           unit.tr           = unit.tr,
+           unit.co           = unit.co,
+           cov.adj           = cov.adj,
+           features          = features,
+           constant          = constant,
+           cointegrated.data = cointegrated.data,
+           anticipation      = anticipation,
+           verbose           = verbose)
+  
+  # Set options for inference
+  u.alpha  <- 0.05                         # Confidence level (in-sample uncertainty)
+  e.alpha  <- 0.05                         # Confidence level (out-of-sample uncertainty)
+  rho      <- NULL                         # Regularization parameter (if NULL it is estimated)
+  rho.max  <- 1                            # Maximum value attainable by rho
+  sims     <- 200                          # Number of simulations
+  V        <- NULL                         # Weighting matrix (if NULL it is the identity mtrx)
+  u.order  <- 1                            # Degree of polynomial in B and C when modelling u
+  u.lags   <- 0                            # Lags of B to be used when modelling u
+  u.sigma  <- "HC1"                        # Estimator for the variance-covariance of u
+  u.missp  <- T                            # If TRUE then the model is treated as misspecified
+  e.lags   <- 0                            # Degree of polynomial in B and C when modelling e
+  e.order  <- 1                            # Lags of B to be used when modelling e
+  e.method <- "gaussian"                   # Estimation method for out-of-sample uncertainty
+  cores    <- 3                            # Number of cores to be used by scpi
+  w.constr <- list(name = "simplex")       # Simplex-type constraint set
+  
+  
+  # Implements estimation and inference procedures for Synthetic Control (SC
+  result  <- scpi(data = df, u.order = u.order, u.lags = u.lags, u.sigma = u.sigma, 
+                  u.missp = u.missp, sims = sims, e.order = e.order, e.lags = e.lags,
+                  e.method = e.method, cores = cores, w.constr = w.constr, u.alpha = u.alpha,
+                  e.alpha = e.alpha, rho = rho, rho.max = rho.max)  
+  
+  print(result)
+  # return estimated information
+  return(result)
+}
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 8/02/2024
+# @written_by: Marcos Paulo
+# @Arg       : result is a list of class "scpi" that have the synthetic results
+# @Arg       : treatment_df is a dataframe containing one treated and its potential donors
+# @Arg       : lower is a number of the lower limit of y scale of plot
+# @Arg       : upper is a number for the upper limit of y scale of plot
+# @Arg       : redd_height is a number for the height of REDD+ text
+# @Arg       : certification_height is a number for the height of certification text
+# @Output    : Returns a plot
+# @purpose   : Function to generate plots for synthetic estimations
+# @desc      : The function first get information about the synthetic prediction, actual outcome
+# lower and upper bound (and others) and then create a dataframe with then. The dataframe is
+# used to create a plot. Code based on scpi package recommendations
+# See https://github.com/nppackages/scpi/blob/main/R/
+generate_plots_synthetic <- function(result, treatment_df, lower, upper, redd_height,
+                                     certification_height){
+  # Get the name of the result dataframe
+  name      <- deparse(substitute(treatment_df))
+  data_name <- sub(".*_", "", name)
+  # Get certification year
+  certification_year <- treatment_df %>% 
+    dplyr::select(certification_date) %>% 
+    dplyr::filter(!is.na(certification_date)) %>%
+    distinct() %>% 
+    pull() %>% 
+    year(.)
+  
+  # Store data on treated unit, synthetic unit, and prediction bars
+  y.fit <- rbind(result$est.results$Y.pre.fit, result$est.results$Y.post.fit)
+  y.act <- rbind(result$data$Y.pre, result$data$Y.post)
+  
+  sc.l  <- result$inference.results$CI.all.gaussian[, 1, drop = FALSE]
+  sc.r  <- result$inference.results$CI.all.gaussian[, 2, drop = FALSE]
+  
+  # Store other specifics
+  period.pre  <- result$data$specs$period.pre
+  period.post <- result$data$specs$period.post
+  T0          <- period.pre[length(period.pre)] # intercept
+  plot.range  <- c(period.pre, period.post)
+  
+  # Actual data
+  dat    <- data.frame(t     = c(period.pre, period.post),
+                       Y.act = c(y.act),
+                       sname = "Treated")
+  
+  # Fill with NAs Y.fit and confidence bounds where missing
+  Y.fit.na  <- matrix(NA, nrow = length(c(period.pre, period.post)))
+  sc.l.na   <- matrix(NA, nrow = length(c(period.pre, period.post)))
+  sc.r.na   <- matrix(NA, nrow = length(c(period.pre, period.post)))
+  
+  names <- strsplit(rownames(y.fit), "\\.")
+  not.missing.plot <- c(period.pre,period.post) %in% unlist(lapply(names, "[[", 2))
+  names <- strsplit(rownames(sc.l), "\\.")
+  not.missing.ci   <- c(period.pre,period.post) %in% unlist(lapply(names, "[[", 2))
+  
+  Y.fit.na[not.missing.plot, 1] <- y.fit
+  sc.l.na[not.missing.ci, 1]    <- sc.l
+  sc.r.na[not.missing.ci, 1]    <- sc.r
+  
+  # Synthetic unit data
+  dat.sc <- data.frame(t        = c(period.pre, period.post),
+                       Y.sc     = Y.fit.na,
+                       lb       = c(sc.l.na), ub = c(sc.r.na),
+                       sname    = "SC Unit")
+  
+  # Set ticks, event label and merge
+  # x.ticks <- c(seq(plot.range[1], plot.range[length(plot.range)], length.out = 5), T0)
+  # x.ticks <- round(unique(x.ticks))
+  
+  event.lab <- paste("\n", "REDD+", sep = "")
+  event.lab.height <- redd_height
+  
+  certification <- paste("\n", "certification", sep = "")
+  certification_height <- certification_height
+  
+  dat.plot    <- subset(dat,    t %in% plot.range)
+  dat.sc.plot <- subset(dat.sc, t %in% plot.range)
+  
+  plotdf <- dplyr::left_join(dat.plot, dat.sc.plot, by = 't') %>% 
+    mutate(Y.act = Y.act / 100,
+           Y.sc = Y.sc / 100,
+           lb = lb / 100,
+           ub = ub / 100)
+  
+  # Plot specs
+  plot <- ggplot() + 
+    theme_bw() +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          axis.text.x = element_text(angle = 0, vjust = 0.3, hjust=1),
+          plot.title = element_text(hjust = 0.5, size = 20, face = "bold", color = "black")) +
+    labs(title = paste(data_name)) +
+    labs(x = "Year", y = "Natural formation (in percentage)") +
+    theme(legend.position = "bottom", legend.box = "horizontal",
+          legend.background = element_rect(fill = "white", color = "black"))
+  
+  # Add Series to plot
+  plot <- plot +
+    geom_line(data = plotdf, aes(x = t, y = Y.act, colour = sname.x), linetype = 'solid') +
+    geom_point(data = plotdf, aes(x = t, y = Y.act, colour = sname.x), shape = 16) +
+    geom_line(data = plotdf, aes(x = t, y = Y.sc, colour = sname.y), linetype = 'dashed') +
+    geom_point(data = plotdf, aes(x = t, y = Y.sc, colour = sname.y), shape = 2) +
+    geom_vline(xintercept = T0, linetype = "dashed", colour = "black") +
+    geom_text(aes(x = T0, label = event.lab, y = event.lab.height), angle = 90, size = 9) +
+    geom_vline(xintercept = certification_year, linetype = "dotted") +
+    geom_text(aes(x = certification_year, label = certification, y = certification_height),
+              angle = 90, size = 9) +
+    scale_y_continuous(limits = c(lower, upper), labels = percent_format()) +
+    scale_color_manual(name = "", values = c("mediumblue", "black"),
+                       labels = c("Synthetic Control", "Treated"),
+                       guide = guide_legend(override.aes = list(
+                         linetype = c('solid','solid'), shape = c(2, 16)))) +
+    geom_errorbar(data = plotdf %>% filter(!is.na(lb) & !is.na(ub)),
+                  aes(x = t, ymin = lb, ymax = ub, colour = sname.y),
+                  width = 0.2, linetype = 2, linewidth = 0.5,
+                  position = position_dodge(0.05)) +
+    geom_linerange(data = plotdf %>% filter(!is.na(lb) & !is.na(ub)),
+                   aes(x = t, ymin = lb, ymax = ub, colour = sname.y),
+                   position = position_dodge(0.05), linewidth = 0.5)
+  
+  
+  # Final plot characteristics
+  plot <- plot +
+  theme(text = element_text(size = 20, color = "black"), # Adjust size of text
+        axis.title = element_text(size = 22, color = "black", face = "bold"), # Title of axis
+        axis.text = element_text(size = 20, color = "black", face = "bold"), # Text in axis
+        legend.title = element_blank(), # Legend title
+        legend.text = element_text(size = 20, color = "black"), # Text in legend
+        legend.key.size = unit(2.5, "lines")) # size of symbols in legend
+  
+  
+  # Return plot
+  return(plot)
+}
+
+
+
+# Function to divide the list of plots into subsets
+split_list <- function(list, n) {
+  lapply(seq(1, length(list), by = n), function(i){
+    list[i:min(i+n-1, length(list))]
+  })
+}
+

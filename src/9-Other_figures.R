@@ -1,10 +1,8 @@
 # =============================================================================
 # Dissertation: Can carbon market save the Amazon: Evidence from Brazil
 # =============================================================================
-# Goal: We created this program to create the shapefiles previous downloaded
-# from Verra registry - https://registry.verra.org/
+# Goal: We created this program to create plots for the dissertation 
 # 
-# We already create a dataset with virtually all 
 # 
 # This program is made to:
 #   1 - Create Figures for presentation
@@ -12,9 +10,6 @@
 # 
 # @Date: out 2023
 # @author: Marcos
-
-# Clear environment
-rm(list = ls())
 
 # Required for increasing reproducibility
 library(groundhog)            # You need to have at least R version = 4.3.1
