@@ -17,7 +17,7 @@
 # @author: Marcos
 
 # Get all libraries and functions
-source(here::here("src", "config_utils.R"))
+source(here::here("src", "config", "config_utils.R"))
 
 # ============================================================================================
 # I: Import data
@@ -63,7 +63,7 @@ dataset <- dataset %>%
                 all_of(new_cols), # Adds new columns from 'issuances' in the third position
                 all_of(original_cols[-c(1:2)])) # Adds the rest of the original columns afterwards
 
-# Apply function from 'src/config_utils.R' to get filter data
+# Apply function from 'src/config/config_utils.R' to get filter data
 dataset_aud_valid <- filter_type_variation(dataset, type = "AUD", tolerance = 0.05,
                                         additional = TRUE)
 dataset_apd_valid <- filter_type_variation(dataset, type = "APD", tolerance = 0.05,

@@ -3,11 +3,11 @@
 # =============================================================================
 # @Goal: Merge land tenure - Cadastro Ambiental Rural (CAR) - information with project info
 # 
-# @Description: In 'src/create_main_shapefiles', we generated a spatial dataset containing all
-# AFOLU projects in Brazil. We want now to collect the CAR info of these projects and merge it
-# in a new dataset. CAR is a public registry, mandatory for all rural properties in Brazil.
-# by merging both datasets, we will have information of the properties that entered the carbon
-# market.
+# @Description: In 'src/process_data/create_main_shapefiles', we generated a spatial dataset
+# containing all AFOLU projects in Brazil. We want now to collect the CAR info of these projects
+# and merge it in a new dataset. CAR is a public registry, mandatory for all rural properties in
+# Brazil. by merging both datasets, we will have information of the properties that entered the
+# carbon market.
 # 
 # @Summary: This script intends to
 #   1 - Get all properties in the land tenure dataset that have REDD+ properties inside
@@ -17,7 +17,7 @@
 # @author: Marcos
 
 # Get all libraries and functions
-source(here::here("src", "config_utils.R"))
+source(here::here("src", "config", "config_utils.R"))
 
 # ============================================================================================
 # I: Import data
@@ -41,7 +41,7 @@ projects_redd <- projects %>%
   filter(afolu == "REDD") %>%
   sf::st_make_valid()
 
-# Applying functions from 'src/config_utils.R'
+# Applying functions from 'src/config/config_utils.R'
 merge_tenure_geometry <- get_land_tenure_info(
   list_state      = states,
   sf_dataframe    = projects_redd,

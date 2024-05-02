@@ -17,7 +17,7 @@
 # @author: Marcos
 
 # Get all libraries and functions
-source(here::here("src", "config_utils.R"))
+source(here::here("src", "config", "config_utils.R"))
 
 # ============================================================================================
 # I: Import data
@@ -52,11 +52,11 @@ set.seed(56)
 verra_apd_names <- c("verra_1147_conservation", "verra_1382_conservation",
                      "verra_2551_conservation", "verra_832_conservation")
 
-# Apply function from 'src/config_utils.R' to get merge information about conservation units
+# Apply function from 'src/config/config_utils.R' to get merge info on conservation units
 merge_filter_clean(conservation_df = conservation_units,
                    verra_df_names = verra_apd_names)
 
-# Apply function from 'src/config_utils.R' to get filter data to create individual dataframes
+# Apply function from 'src/config/config_utils.R' to create data for individual dataframes
 create_treatment_dfs(final_redd_valid, additional = TRUE)
 
 
@@ -71,7 +71,7 @@ outcome_var            <- "Total_natural_formation"
 covariates_adjust      <- NULL
 covariates_adjust_more <- list(c("constant", "trend"))
 
-# Apply function from 'src/config_utils.R' to estimate synthetic controls and plot them
+# Apply function from 'src/config/config_utils.R' to estimate synthetic controls and plot them
 synthetic_1094    <- estimate_unit_synthetic(treatment_df = verra_1094,
                                              acceptable_variation = tolerance,
                                              outcome = outcome_var,

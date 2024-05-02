@@ -14,17 +14,17 @@ groundhog.library(
   pkg  = c(
     "assertthat", "broom", "cartography", "compiler", "data.table", "dplyr", "exactextractr",
     "foreign", "furrr", "ggplot2", "haven", "lubridate", "lwgeom", "patchwork", 
-    "purrr", "pdftools", "stringr", "raster", "RColorBrewer", "readr", "readxl",
-    "rnaturalearth", "rnaturalearthdata", "scpi", "scales", "sf", "sp", "terra",
+    "purrr", "pdftools", "stringr", "raster", "RColorBrewer", "readr", "readxl","scpi",
+    "scales", "sf", "sp", "terra",
     "tidyr", "viridis"),
   date = "2024-03-03")
 
 here::i_am(".gitignore")
 
-
 # ############################################################################################
 # Functions
 # ############################################################################################
+
 # Function --------------------------------------------------------------------
 # @Arg       : start_year is number representing first year to download
 # @Arg       : end_year is number representing last year to download
@@ -51,6 +51,26 @@ download_mapbiomas <- function(start_year = 2000, end_year = 2022) {
   }
 }
 
+
+# Function --------------------------------------------------------------------
+# @Arg       : No arg.
+# @Output    : No output, prints status messages to the console.
+# @Purpose   : Checks if fonts have been imported and loads them if not.
+# @Written_on: 10/01/2024
+# @Written_by: Marcos Paulo
+check_and_import_fonts <- function() {
+  # Check if any fonts have been imported by checking the length of the fonts list
+  if (length(fonts()) == 0) {
+    cat("Importing fonts...\n")
+    # Import fonts using extrafont's font_import function
+    font_import()
+    # Load fonts into R's graphic devices. Windows and non-Windows devices are handled.
+    loadfonts(device = ifelse(.Platform$OS.type == "windows", "win", "cairo"))
+    cat("Fonts have been imported and loaded.\n")
+  } else {
+    cat("Fonts have already been imported previously.\n")
+  }
+}
 
 
 # Function --------------------------------------------------------------------
@@ -513,7 +533,7 @@ get_coverage_classes <- function(land_coverage_df, legend_df, projects_df){
   Non_Forest_Natural <- as.character(c(legend_df[7:13, "Description"])[[1]])
   Non_Forest_Natural <- Non_Forest_Natural[Non_Forest_Natural %in% names(land_coverage_df)]
   # Get the classes corresponding with Farming and select only the needed classes
-  Farming <- as.character(c(legend_df[15:29, "Description"])[[1]])
+  Farming <- as.character(c(legend_df[14:29, "Description"])[[1]])
   Farming <- Farming[Farming %in% names(land_coverage_df)]
   # Get the classes corresponding with Non vegetated area and select only the needed classes
   Non_vegetated_area <- as.character(c(legend_df[30:34, "Description"])[[1]])
@@ -544,6 +564,53 @@ get_coverage_classes <- function(land_coverage_df, legend_df, projects_df){
   # Return new created dataframe
   return(covered_agg)
 }
+
+
+# Function --------------------------------------------------------------------
+# @written_on: 12/02/2024
+# @written_by: Marcos Paulo
+# @param land_coverage: SpatRaster object containing land use coverage data.
+# @param legend_df: Dataframe with mapping from raster values to general land use categories.
+# @return: Returns a SpatRaster object with reclassified land cover data.
+# @purpose: Reclassify raster land cover data into broad categories based on provided legend.
+# @desc: This function reclassifies the raster data based on the categories defined in
+# legend_df, which correlates specific raster values to broader land use categories. The
+# reclassification is intended to simplify the data for analysis or further processing. For
+# detailed definitions of the classification, please visit
+# https://brasil.mapbiomas.org/codigos-de-legenda/, legend 8.
+reclassifyLandCoverage <- function(land_coverage, legend_df) {
+  
+  # Define the indices for each broad category
+  forest_values             <- 1:6
+  non_forest_natural_values <- 7:13
+  farming_values            <- 14:29
+  non_vegetated_values      <- 30:34
+  water_values              <- 35:37
+  
+  # Extract the Class_ID for each category based on the defined ranges
+  forest             <- legend_df$Class_ID[forest_values]
+  non_forest_natural <- legend_df$Class_ID[non_forest_natural_values]
+  farming            <- legend_df$Class_ID[farming_values]
+  non_vegetated      <- legend_df$Class_ID[non_vegetated_values]
+  water              <- legend_df$Class_ID[water_values]
+  
+  # Create vectors for reclassification directly
+  values  <- c(forest, non_forest_natural, farming, non_vegetated, water)
+  classes <- rep(1:5, times = c(length(forest), 
+                                length(non_forest_natural),
+                                length(farming), 
+                                length(non_vegetated), 
+                                length(water)))
+  
+  # Create a matrix for classification
+  reclass_matrix <- cbind(values, classes)
+  
+  # Reclassify the raster using terra::classify
+  land_coverage_classified <- terra::classify(land_coverage, reclass_matrix)
+  
+  return(land_coverage_classified)
+}
+
 
 # Function --------------------------------------------------------------------
 # @written_on: 12/02/2024

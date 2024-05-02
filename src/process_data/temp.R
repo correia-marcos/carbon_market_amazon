@@ -1,3 +1,31 @@
+# ===========================================
+# =============================================================================
+# Deforestation in Legal amazon
+# =============================================================================
+# =============================================================================
+
+annual_deforest <- read.table("Data/Deforestation/agg_legal_amazon.csv",
+                              sep = ";", header = TRUE)
+
+# Turn Area variable into numerical value
+annual_deforest$area <- as.numeric(gsub(",", ".",
+                                        gsub("\\.", "", 
+                                             annual_deforest$area.km.)))
+
+ggplot(data = annual_deforest, aes(x = year, y = area,
+                                   group=1)) +
+  geom_line(color = "red") +
+  geom_point(color = "red") +
+  labs(x = "Year",
+       y = "Deforested Area (km^2)") +
+  theme_minimal()
+
+ggsave(path = "Fig/", filename = "Increase in deforestation - Legal Amazon.tiff",
+       device='tiff', dpi=700)
+
+
+
+
 
 final_redd <- 
   readr::read_csv(here::here("results", "final_dataset_synthetic", "final_redd_valid.csv")) %>% 

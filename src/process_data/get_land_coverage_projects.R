@@ -18,7 +18,7 @@
 # @author: Marcos
 
 # Get all libraries and functions
-source(here::here("src", "config_utils.R"))
+source(here::here("src", "config", "config_utils.R"))
 
 # ============================================================================================
 # I: Import data

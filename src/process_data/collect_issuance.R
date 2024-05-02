@@ -18,7 +18,7 @@
 # @author: Marcos
 
 # Get all libraries and functions
-source(here::here("src", "config_utils.R"))
+source(here::here("src", "config", "config_utils.R"))
 
 # ============================================================================================
 # I: Import data
@@ -33,7 +33,7 @@ issues_files <- list.files(here::here("Data", "Projects_info", "Issuances"),
 # ============================================================================================
 # II: Process data
 # ============================================================================================
-# Applying functions from 'src/config_utils.R'
+# Applying functions from 'src/config/config_utils.R'
 
 # Loop through files and combine data from all files
 all_project_data <- lapply(issues_files, process_project_info)

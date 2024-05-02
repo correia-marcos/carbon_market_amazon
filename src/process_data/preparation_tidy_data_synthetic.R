@@ -17,7 +17,7 @@
 # @author: Marcos
 
 # Get all libraries and functions
-source(here::here("src", "config_utils.R"))
+source(here::here("src", "config", "config_utils.R"))
 
 # ============================================================================================
 # I: Import data
@@ -61,7 +61,7 @@ legend <-
 # ============================================================================================
 # II: Process data
 # ============================================================================================
-# Apply function from 'src/config_utils.R' to change columns names in all coverage datasets
+# Apply function from 'src/config/config_utils.R' to change columns names in all datasets
 coverage_buffer <- convert_columns_panel(
   legend_df            = legend,
   column_id            = 'Class_ID',
@@ -99,7 +99,7 @@ coverage_redd_divided <- convert_columns_panel(
   land_coverage_df     = coverage_redd_divided)
 
 
-# Apply function from 'src/config_utils.R' to summarize values
+# Apply function from 'src/config/config_utils.R' to summarize values
 coverage_intersections <- agg_coverage_values(land_coverage_df    = coverage_intersections,
                                               property_project_df = property_project)
 coverage_redd         <- agg_coverage_values(land_coverage_df     = coverage_redd,
@@ -111,7 +111,7 @@ coverage_property     <- agg_coverage_values(land_coverage_df     = coverage_pro
 coverage_buffer       <- agg_coverage_values(land_coverage_df     = coverage_buffer,
                                              property_project_df  = property_project)
 
-# Apply function from 'src/config_utils.R' to get general classes of land use
+# Apply function from 'src/config/config_utils.R' to get general classes of land use
 buffer             <- get_coverage_classes(land_coverage_df = coverage_buffer,
                                            legend_df = legend)
 conservation       <- get_coverage_classes(land_coverage_df = coverage_conservation,
@@ -125,7 +125,7 @@ redd               <- get_coverage_classes(land_coverage_df = coverage_redd,
 redd_valid         <- get_coverage_classes(land_coverage_df = coverage_redd_divided,
                                            legend_df = legend)
 
-# Apply function from 'src/config_utils.R' to get general classes of land use
+# Apply function from 'src/config/config_utils.R' to get general classes of land use
 buffer_percentage        <- calculate_land_percentages(buffer)
 conversation_percentage  <- calculate_land_percentages(conservation)
 intersections_percentage <- calculate_land_percentages(intersections)

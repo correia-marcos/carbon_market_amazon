@@ -1,28 +1,39 @@
-# =============================================================================
+# ============================================================================= 
 # Dissertation: Can carbon market save the Amazon: Evidence from Brazil
 # =============================================================================
-# Goal: We created this program to create plots for the dissertation 
-# 
-# 
-# This program is made to:
-#   1 - Create Figures for presentation
-# 
+# @Goal: Produce a figure of the distribution of carbon projects by type in Brazil
+#
+# @Description: We use data from verra registry to plot all projects distribute by type using
+# bar plot. Please check: 
+# https://registry.verra.org
+# https://www.ibge.gov.br/geociencias/todos-os-produtos-geociencias.html
+#
+# @summary: This program intends to: 
+#    1 - Create a bar plot of all carbon projects in Brazil distribute by type 
 # 
 # @Date: out 2023
 # @author: Marcos
 
-# Required for increasing reproducibility
-library(groundhog)            # You need to have at least R version = 4.3.1
+# Get all libraries and functions
+source(here::here("src", "config", "config_utils.R"))
 
-# Required packages 
-pkgs <- c("ggplot2", "haven", "foreign", "dplyr", "sf", "sp", "terra", "broom",
-          "raster", "viridis", "cartography", "readxl", "RColorBrewer")
+# Get specific heavy packages for plotting
+groundhog.library(pkg  = c("extrafont", "Cairo"),
+                  date = "2024-03-03")
 
-# Load packages
-groundhog.library(pkgs, "2023-09-01")
+# Run function from 'src/config/config_utils.R' to check if fonts have already been imported
+check_and_import_fonts()
+
+# ============================================================================================
+# I: Import data
+# ============================================================================================
+
+# Import csv file previous created on 'src/process_data/collect_issuance.csv'
+data <- readr::read_csv(here::here("results", "projects_base", "base_projects.csv"))
+
+
 
 # Import data: excel previous created by author and shapefile of Brazil (IBGE)
-data <- readxl::read_excel("Data/base_full.xlsx")
 brazil <- as(sf::st_read("Data/Brazil_territory"),
              "Spatial")
 brazil_df <- sf::st_as_sf(brazil) # turn Brazil shapefile into a dataframe
@@ -30,10 +41,6 @@ brazil_df <- sf::st_as_sf(brazil) # turn Brazil shapefile into a dataframe
 # Substituting white spaces per underline
 colnames(data) <- gsub(" ", "_", colnames(data))
 
-# Inspect Brazil shapefile
-plot(brazil)
-crs(brazil)
-extent(brazil)
 
 # =============================================================================
 # =============================================================================
@@ -41,7 +48,7 @@ extent(brazil)
 # =============================================================================
 # =============================================================================
 
-# Divide projects by their state, then summarise number of projects by state
+# Divide projects by their state, then summarize number of projects by state
 count_state <- data %>%
   tidyr::separate_rows(State, sep = "/", convert = TRUE) %>% 
   group_by(State) %>%

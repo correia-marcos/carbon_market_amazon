@@ -4,8 +4,8 @@
 # @Goal: Produce figure of worldwide ETS available
 # 
 # @Description: We use data from the World Bank Carbon Pricing Dashboard to create make a plot
-# with the all ETS available worldwide. We also take geometries from countries, cities,
-# and regions so that we can plot a world view of ETS. We downloaded data in April 2024.Please
+# with the all ETS available worldwide. We also take geometries from countries, cities, and
+# regions so that we can plot a world view of ETS. We downloaded data in April 2024. Please
 # check:
 # https://carbonpricingdashboard.worldbank.org/
 # https://open.alberta.ca/opendata/gda-4d939041-851b-4848-bd30-44dbf129e16c
@@ -24,7 +24,14 @@
 # @author: Marcos
 
 # Get all libraries and functions
-source(here::here("src", "config_utils.R"))
+source(here::here("src", "config", "config_utils.R"))
+
+# Get specific heavy packages for plotting
+groundhog.library(pkg  = c("rnaturalearth","rnaturalearthdata", "extrafont", "Cairo"),
+                  date = "2024-03-03")
+
+# Run function from 'src/config/config_utils.R' to check if fonts have already been imported
+check_and_import_fonts()
 
 # ============================================================================================
 # I: Import data
@@ -42,16 +49,16 @@ japan              <- sf::st_read(here::here("data", "ETS", "Japan"))
 russia             <- sf::st_read(here::here("data", "ETS", "Russia"))
 
 # Define US states that represent RGGI ETS and euro countries the represent EU ETS
-rggi           <- c("Connecticut", "Delaware", "Maine", "Maryland", "Massachusetts",
-                    "New Hampshire", "New Jersey", "New York", "Pennsylvania", "Rhode Island",
-                    "Vermont")
+rggi               <- c("Connecticut", "Delaware", "Maine", "Maryland", "Massachusetts",
+                        "New Hampshire", "New Jersey", "New York", "Pennsylvania",
+                        "Rhode Island", "Vermont")
 
-euro_countries <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Republic of Cyprus",
-                    "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Germany",
-                    "Greece", "Hungary", "Ireland", "Italy", "Latvia", "Lithuania",
-                    "Luxembourg","Malta", "Netherlands", "Poland", "Portugal", "Romania",
-                    "Slovakia", "Slovenia", "Spain", "Sweden", "Iceland", "Liechtenstein",
-                    "Norway")
+euro_countries     <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Republic of Cyprus",
+                        "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Germany",
+                        "Greece", "Hungary", "Ireland", "Italy", "Latvia", "Lithuania",
+                        "Luxembourg","Malta", "Netherlands", "Poland", "Portugal", "Romania",
+                        "Slovakia", "Slovenia", "Spain", "Sweden", "Iceland", "Liechtenstein",
+                        "Norway")
 
 # ============================================================================================
 # II: Process data
@@ -177,8 +184,9 @@ plot <- ggplot() +
                      name = "Status subnational ETS:", drop = FALSE) +
   theme_minimal() +
   theme(legend.position = "bottom", legend.box = "vertical",
-        legend.title = element_text(size = 20),
-        legend.text = element_text(size = 20)) +
+        legend.title = element_text(size = 23),
+        legend.text = element_text(size = 23),
+        text = element_text(family = "Times New Roman")) +
   guides(
     fill = guide_legend(order = 1, title = "Status National/Regional ETS:",
                         override.aes = list(size = 1)),
@@ -189,5 +197,5 @@ plot
 # ============================================================================================
 # III: Save processed data
 # ============================================================================================
-ggsave(here::here("results", "Fig", "ets_status_map.pdf"), plot,
-       device = "pdf", width = 16, height = 9, dpi = 300)
+ggsave(here::here("results", "figures", "ets_status_map.pdf"), plot,
+       device = cairo_pdf, width = 16, height = 9, dpi = 300)

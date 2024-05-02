@@ -7,7 +7,7 @@
 # took all KML files from Verra Registry (https://registry.verra.org/), open then in QGIS
 # software in order to repair issues (mostly merge layers and join shapes), and converted the
 # files into shapefile format. Now, we want to add all projects together in a single dataframe
-# containing, also, the previous created dataset from 'src/collect_issuance.csv'
+# containing, also, the previous created dataset from 'src/process_data/collect_issuance.csv'
 # 
 # @Summary: This program intends to
 #   1 - Create a dataframe all projects shapefiles 
@@ -17,12 +17,12 @@
 # @author: Marcos
 
 # Get all libraries and functions
-source(here::here("src", "config_utils.R"))
+source(here::here("src", "config", "config_utils.R"))
 
 # ============================================================================================
 # I: Import data
 # ============================================================================================
-# Import csv file previous created on 'src/collect_issuance.csv'
+# Import csv file previous created on 'src/process_data/collect_issuance.csv'
 data <- readr::read_csv(here::here("results", "projects_base", "base_projects.csv"))
 
 # List of Shapefiles projects

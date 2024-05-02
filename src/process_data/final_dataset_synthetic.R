@@ -17,7 +17,7 @@
 # @author: Marcos
 
 # Get all libraries and functions
-source(here::here("src", "config_utils.R"))
+source(here::here("src", "config", "config_utils.R"))
 
 # ============================================================================================
 # I: Import data
@@ -58,7 +58,7 @@ conservation_units <-
 # ============================================================================================
 # II: Process data
 # ============================================================================================
-# Apply function from 'src/config_utils.R' to merge datasets
+# Apply function from 'src/config/config_utils.R' to merge datasets
 merged_buffer        <- merge_data_synthetic(land_coverage_df = buffer_percentage,
                                              information_df = projects,
                                              column_by = "id_registry")
@@ -83,7 +83,7 @@ merged_redd_valid    <- merge_data_synthetic(land_coverage_df = redd_valid_perce
                                              information_df = projects,
                                              column_by = "id_registry")
 
-# Apply function from 'src/config_utils.R' to get a treatment columns
+# Apply function from 'src/config/config_utils.R' to get a treatment columns
 final_buffer        <- create_treatment_columns(df = merged_buffer,
                                                 years_antecipation = 2)
 
@@ -107,7 +107,7 @@ projects_apd_treated <- projects %>%
 
 print(projects_apd_treated)
 
-# Apply function from 'src/config_utils.R' to create dataframes for each APD above
+# Apply function from 'src/config/config_utils.R' to create dataframes for each APD above
 verra_1147 <- get_treatment_apd_cu(projects_id = projects_apd_treated[1],
                                    merged_project = merged_redd_valid,
                                    deforestation_criterion = 0.2, # *100 = percentage
