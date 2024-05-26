@@ -27,7 +27,7 @@
 source(here::here("src", "config", "config_utils.R"))
 
 # Get specific heavy packages for plotting
-groundhog.library(pkg  = c("rnaturalearth","rnaturalearthdata", "extrafont", "Cairo"),
+groundhog.library(pkg  = c("rnaturalearth","rnaturalearthdata"),
                   date = "2024-03-03")
 
 # Run function from 'src/config/config_utils.R' to check if fonts have already been imported
@@ -172,10 +172,10 @@ country_ets <- country_ets %>%
 plot <- ggplot() +
   geom_sf(data = country_ets, aes(fill = colors), size = 1) +
   geom_sf(data = state_ets_points, aes(color = status_small), size = 1.7, shape = 19) +
-  scale_fill_manual(values = c("Under consideration" = "darkkhaki",
-                               "In development" = "cadetblue",
-                               "Implemented" = "seagreen",
-                               "EU-ETS" = "royalblue",
+  scale_fill_manual(values = c("Under consideration" = "peru",
+                               "In development" = "darkolivegreen4",
+                               "Implemented" = "darkgreen",
+                               "EU-ETS" = "darkblue",
                                "No implementation" = "lightgrey"),
                     name = "Status National / Regional ETS:", drop = FALSE) +
   scale_color_manual(values = c("Under consideration" = "lightsteelblue",

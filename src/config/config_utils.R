@@ -12,11 +12,10 @@ library(groundhog)            # You need to have at least R version = 4.3.1
 # Loading required packages 
 groundhog.library(
   pkg  = c(
-    "assertthat", "broom", "cartography", "compiler", "data.table", "dplyr", "exactextractr",
-    "foreign", "furrr", "ggplot2", "haven", "lubridate", "lwgeom", "patchwork", 
-    "purrr", "pdftools", "stringr", "raster", "RColorBrewer", "readr", "readxl","scpi",
-    "scales", "sf", "sp", "terra",
-    "tidyr", "viridis"),
+    "assertthat", "broom", "Cairo","cartography", "compiler", "data.table", "dplyr", 
+    "exactextractr", "extrafont", "foreign", "furrr", "ggplot2", "haven", "lubridate", "lwgeom", 
+    "patchwork", "purrr", "pdftools", "stringr", "raster", "RColorBrewer", "readr", "readxl",
+    "scpi", "scales", "sf", "sp", "terra", "tidyr", "viridis"),
   date = "2024-03-03")
 
 here::i_am(".gitignore")
@@ -849,17 +848,25 @@ filter_type_variation <- function(df, type, tolerance, additional = FALSE){
     data <- df %>%
       filter(redd_type == type)
   }
-    
   
-  # Identify donors with no/low variation - reduction donor pool may be important
-  donors_no_var <- data %>%
+  # Identify the first treatment year
+  treatments <- data %>% filter(treatment_start_year != 0)
+  treatment_years <- sort(unique(treatments$treatment_start_year))
+  
+  # Filter donor data and data from the period between 2000 and the first treatment year
+  data_period <- data %>%
+    # filter(is.na(certification_date)) %>% 
+    filter(year >= 2000 & year <= head(treatment_years, n = 1)) # second treated
+  
+  # Identify treated/donors with no/low variation - treated with low variation make errors in the ATT
+  ids_no_var <- data_period %>%
     group_by(id_registry) %>%
     filter(diff(range(Total_natural_formation)) <= tolerance) %>% # 0.0005 all time
     distinct(id_registry) %>%
     ungroup() %>% 
     pull(id_registry)
   
-  data <- data[!data$id_registry %in% donors_no_var, ]
+  data <- data[!data$id_registry %in% ids_no_var, ]
   
   return(data)
 }
@@ -872,7 +879,8 @@ filter_type_variation <- function(df, type, tolerance, additional = FALSE){
 # @Arg       : additional is a logical argument to take projects that are both APD and AUD
 # @Output    : Dataframes with one treated and all correct potential donors
 # @purpose   : Function to create single dataframes
-# @desc      : The function finds the treated units and sets appropriates donors
+# @desc      : The function finds the treated units and sets appropriates donors. If treated is
+# APD, add additional lines to each. Else ignore additional.
 create_treatment_dfs <- function(df, additional = FALSE) {
   # Identify treatment columns
   treatment_cols <- grep("^treatment_", names(df), value = TRUE)
@@ -894,7 +902,7 @@ create_treatment_dfs <- function(df, additional = FALSE) {
     
     # Filter for the treated unit and controls with the same redd_type (never treated)
     # if Additional is True, we also take AUD/APD projects
-    if(additional){
+    if(additional && treated_redd_type == "APD"){
       filtered_df <- df %>%
         filter(redd_type == treated_redd_type | redd_type == "AUD/APD") %>%
         filter((get(paste0("treatment_", id)) == 1) | 
@@ -1020,14 +1028,11 @@ estimate_unit_synthetic <- function(treatment_df, acceptable_variation, outcome,
   # Create main dataframe
   data <- rbind(values_id, donors)
   
-  # List of features
-  # list_features <- list(c(outcome,"area_ha"))
-  
-  ### Set options for data preparation
+  # Set options for data preparation
   id.var            <- "id_registry"                              # ID variable
   time.var          <- "year"                                     # Time variable
-  period.pre        <- seq(from = first(data$year), to = treated_year, by = 1)
-  period.post       <- seq(from = treated_year + 1, to = last(data$year))
+  period.pre        <- seq(from = first(data$year), to = treated_year - 1, by = 1)
+  period.post       <- seq(from = treated_year, to = last(data$year))
   unit.tr           <- treated_id                                 # Treated unit
   unit.co           <- setdiff(unique(data$id_registry), unit.tr) # Donors pool
   outcome.var       <- outcome                                    # Outcome variable
@@ -1122,11 +1127,14 @@ generate_plots_synthetic <- function(result, treatment_df, lower, upper, redd_he
     year(.)
   
   # Store data on treated unit, synthetic unit, and prediction bars
-  y.fit <- rbind(result$est.results$Y.pre.fit, result$est.results$Y.post.fit)
-  y.act <- rbind(result$data$Y.pre, result$data$Y.post)
+  y.fit   <- rbind(result$est.results$Y.pre.fit, result$est.results$Y.post.fit)
+  y.act   <- rbind(result$data$Y.pre, result$data$Y.post)
   
-  sc.l  <- result$inference.results$CI.all.gaussian[, 1, drop = FALSE]
-  sc.r  <- result$inference.results$CI.all.gaussian[, 2, drop = FALSE]
+  sc.l    <- result$inference.results$CI.all.gaussian[, 1, drop = FALSE]
+  sc.r    <- result$inference.results$CI.all.gaussian[, 2, drop = FALSE]
+  
+  sc.in.l <-  result$inference.results$CI.in.sample[, 1, drop = FALSE]
+  sc.in.r <-  result$inference.results$CI.in.sample[, 2, drop = FALSE]
   
   # Store other specifics
   period.pre  <- result$data$specs$period.pre
@@ -1140,9 +1148,12 @@ generate_plots_synthetic <- function(result, treatment_df, lower, upper, redd_he
                        sname = "Treated")
   
   # Fill with NAs Y.fit and confidence bounds where missing
-  Y.fit.na  <- matrix(NA, nrow = length(c(period.pre, period.post)))
-  sc.l.na   <- matrix(NA, nrow = length(c(period.pre, period.post)))
-  sc.r.na   <- matrix(NA, nrow = length(c(period.pre, period.post)))
+  Y.fit.na   <- matrix(NA, nrow = length(c(period.pre, period.post)))
+  sc.l.na    <- matrix(NA, nrow = length(c(period.pre, period.post)))
+  sc.r.na    <- matrix(NA, nrow = length(c(period.pre, period.post)))
+  sc.in.l.na <- matrix(NA, nrow = length(c(period.pre, period.post)))
+  sc.in.r.na <- matrix(NA, nrow = length(c(period.pre, period.post)))
+  
   
   names <- strsplit(rownames(y.fit), "\\.")
   not.missing.plot <- c(period.pre,period.post) %in% unlist(lapply(names, "[[", 2))
@@ -1152,11 +1163,16 @@ generate_plots_synthetic <- function(result, treatment_df, lower, upper, redd_he
   Y.fit.na[not.missing.plot, 1] <- y.fit
   sc.l.na[not.missing.ci, 1]    <- sc.l
   sc.r.na[not.missing.ci, 1]    <- sc.r
+  sc.in.l.na[not.missing.ci, 1] <- sc.in.l
+  sc.in.r.na[not.missing.ci, 1] <- sc.in.r
   
   # Synthetic unit data
   dat.sc <- data.frame(t        = c(period.pre, period.post),
                        Y.sc     = Y.fit.na,
-                       lb       = c(sc.l.na), ub = c(sc.r.na),
+                       lb       = c(sc.l.na), 
+                       ub       = c(sc.r.na),
+                       in_lb    = c(sc.in.l.na),
+                       in_ub    = c(sc.in.r.na),
                        sname    = "SC Unit")
   
   # Set ticks, event label and merge
@@ -1176,54 +1192,42 @@ generate_plots_synthetic <- function(result, treatment_df, lower, upper, redd_he
     mutate(Y.act = Y.act / 100,
            Y.sc = Y.sc / 100,
            lb = lb / 100,
-           ub = ub / 100)
+           ub = ub / 100,
+           in_lb = in_lb / 100,
+           in_ub = in_ub / 100)
   
   # Plot specs
-  plot <- ggplot() + 
+  plot <- ggplot(plotdf, aes(x = t)) + 
     theme_bw() +
-    theme(panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank(),
-          axis.text.x = element_text(angle = 0, vjust = 0.3, hjust=1),
-          plot.title = element_text(hjust = 0.5, size = 20, face = "bold", color = "black")) +
-    labs(title = paste(data_name)) +
-    labs(x = "Year", y = "Natural formation (in percentage)") +
+    geom_line(aes(y = Y.act, group = 1), colour = "black", linetype = "solid") +
+    geom_point(aes(y = Y.act, shape = "Treated"), colour = "black", size = 3) +
+    geom_line(aes(y = Y.sc, group = 1), colour = "darkred", linetype = "dashed") +
+    geom_point(aes(y = Y.sc, shape = "Synthetic Control"), colour = "darkred", size = 3) +
+    # geom_ribbon(aes(ymin = lb, ymax = ub), fill = "darkred", alpha = 0.6) +
+    geom_errorbar(aes(ymin = lb, ymax = ub, group = 1), # change to in_ub or in_lb 
+                  colour = "darkred", width = 0.4, linetype = 1, linewidth = 0.9) +
+    labs(title = paste(data_name), x = "Year", y = "Natural formation (in percentage)") +
+    scale_shape_manual(name = "Legend", values = c("Treated" = 16, "Synthetic Control" = 17), 
+                       labels = c("Synthetic Control", "Treated")) +
     theme(legend.position = "bottom", legend.box = "horizontal",
-          legend.background = element_rect(fill = "white", color = "black"))
-  
-  # Add Series to plot
-  plot <- plot +
-    geom_line(data = plotdf, aes(x = t, y = Y.act, colour = sname.x), linetype = 'solid') +
-    geom_point(data = plotdf, aes(x = t, y = Y.act, colour = sname.x), shape = 16) +
-    geom_line(data = plotdf, aes(x = t, y = Y.sc, colour = sname.y), linetype = 'dashed') +
-    geom_point(data = plotdf, aes(x = t, y = Y.sc, colour = sname.y), shape = 2) +
-    geom_vline(xintercept = T0, linetype = "dashed", colour = "black") +
-    geom_text(aes(x = T0, label = event.lab, y = event.lab.height), angle = 90, size = 9) +
-    geom_vline(xintercept = certification_year, linetype = "dotted") +
-    geom_text(aes(x = certification_year, label = certification, y = certification_height),
-              angle = 90, size = 9) +
+          legend.title = element_blank(),
+          plot.title = element_text(hjust = 0.5, size = 20, face = "bold", color = "black"),
+          axis.text.x = element_text(angle = 0, vjust = 0.3, hjust = 1),
+          axis.title = element_text(size = 22, color = "black", face = "bold"),
+          axis.text = element_text(size = 20, color = "black", face = "bold"),
+          legend.text = element_text(size = 20, color = "black"),
+          legend.key.size = unit(2.5, "lines"),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          text = element_text(size = 20, color = "black")) +
     scale_y_continuous(limits = c(lower, upper), labels = percent_format()) +
-    scale_color_manual(name = "", values = c("mediumblue", "black"),
-                       labels = c("Synthetic Control", "Treated"),
-                       guide = guide_legend(override.aes = list(
-                         linetype = c('solid','solid'), shape = c(2, 16)))) +
-    geom_errorbar(data = plotdf %>% filter(!is.na(lb) & !is.na(ub)),
-                  aes(x = t, ymin = lb, ymax = ub, colour = sname.y),
-                  width = 0.2, linetype = 2, linewidth = 0.5,
-                  position = position_dodge(0.05)) +
-    geom_linerange(data = plotdf %>% filter(!is.na(lb) & !is.na(ub)),
-                   aes(x = t, ymin = lb, ymax = ub, colour = sname.y),
-                   position = position_dodge(0.05), linewidth = 0.5)
+    geom_vline(xintercept = T0, linetype = "dashed", colour = "black") +
+    annotate("text", x = T0, y = event.lab.height, label = event.lab, angle = 90, size = 9) +
+    geom_vline(xintercept = certification_year, linetype = "dotted") +
+    annotate("text", x = certification_year, y = certification_height, 
+             label = certification, angle = 90, size = 9)
   
-  
-  # Final plot characteristics
-  plot <- plot +
-  theme(text = element_text(size = 20, color = "black"), # Adjust size of text
-        axis.title = element_text(size = 22, color = "black", face = "bold"), # Title of axis
-        axis.text = element_text(size = 20, color = "black", face = "bold"), # Text in axis
-        legend.title = element_blank(), # Legend title
-        legend.text = element_text(size = 20, color = "black"), # Text in legend
-        legend.key.size = unit(2.5, "lines")) # size of symbols in legend
-  
+  plot
   
   # Return plot
   return(plot)

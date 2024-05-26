@@ -20,20 +20,15 @@
 # Get all libraries and functions
 source(here::here("src", "config", "config_utils.R"))
 
-# Get specific heavy packages for plotting
-groundhog.library(pkg  = c("extrafont", "Cairo"),
-                  date = "2024-03-03")
-
 # Run function from 'src/config/config_utils.R' to check if fonts have already been imported
 check_and_import_fonts()
 
 # ============================================================================================
 # I: Import data
 # ============================================================================================
-
 # Import required data
 legal_amazon        <- sf::st_read(here::here("data", "Amazon_info", "Legal_amazon"))
-legal_amazon_border <- sf::st_read(here::here("data", "Amazon_info", "Legal_amazon(unique)"))
+legal_amazon_border <- sf::st_read(here::here("data", "Amazon_info", "Legal_amazon_limits"))
 projects            <- sf::st_read(here::here("results",
                                               "base_afolu_complete",
                                               "base_afolu_complete.gpkg"))
@@ -56,8 +51,8 @@ color_mapping <- setNames(c("darkgreen", "olivedrab2", "sandybrown", "gray", "bl
 projects_redd <- projects %>%
   filter(project_type == "REDD+") %>% 
   mutate(color = ifelse(project_status %in% c("Registered", "On Hold"),
-                         "cyan", 
-                         "red4"),
+                         "black", 
+                         "darkred"),
          .after = project_type) 
 
 # Convert the legal amazon dataset to the same CRS as projects and land_coverage
@@ -95,8 +90,9 @@ land_coverage_reduced <- land_coverage_reduced %>%
 # Plotting
 # -----------------------------------------
 plot <- ggplot() +
-  geom_raster(data = land_coverage_reduced, aes(x = x, y = y, fill = color), alpha = 0.7) +
-  geom_sf(data = legal_amazon, fill = NA, color = "white", ) +
+  geom_raster(data = land_coverage_reduced, aes(x = x, y = y, fill = color), alpha = 0.85) +
+  geom_sf(data = legal_amazon, fill = NA, color = "white") +
+  geom_sf(data = legal_amazon_border, fill = NA, color = "black") +
   geom_sf(data = projects_redd, aes(fill = color), color = NA, size = 2, shape = 21) +
   scale_fill_identity(guide = 'legend',
                       labels = c("darkgreen" = "Forest",
@@ -104,15 +100,15 @@ plot <- ggplot() +
                                  "sandybrown" = "Farming", 
                                  "gray" = "Non vegetated area",
                                  "blue" = "Water",
-                                 "cyan" = "REDD+ treated", 
-                                 "red4" = "REDD+ donors (not yet treated)"),
+                                 "black" = "REDD+ treated", 
+                                 "darkred" = "REDD+ donors (not yet treated)"),
                       breaks = c("darkgreen",
                                  "olivedrab2",
                                  "sandybrown",
                                  "gray",
                                  "blue",
-                                 "cyan",
-                                 "red4")) +
+                                 "black",
+                                 "darkred")) +
   scale_shape_manual(values = c(16, 16, 16, 16, 16, 17, 18)) +
   coord_sf() +
   theme(
